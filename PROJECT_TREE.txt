@@ -1,116 +1,221 @@
-mr-sk-eatries/
+MR-SK-EATRIES/
 ├── backend
 │   ├── logs
+│   │   └── .gitkeep
 │   ├── src
 │   │   ├── config
+│   │   │   └── .gitkeep
 │   │   ├── controllers
+│   │   │   └── .gitkeep
 │   │   ├── jobs
+│   │   │   └── .gitkeep
 │   │   ├── middleware
+│   │   │   └── .gitkeep
 │   │   ├── models
+│   │   │   └── .gitkeep
 │   │   ├── routes
+│   │   │   └── .gitkeep
 │   │   ├── services
+│   │   │   └── .gitkeep
 │   │   ├── sockets
+│   │   │   └── .gitkeep
 │   │   ├── types
+│   │   │   └── .gitkeep
 │   │   ├── utils
+│   │   │   └── .gitkeep
 │   │   └── validators
+│   │       └── .gitkeep
 │   ├── tests
 │   │   ├── integration
+│   │   │   └── .gitkeep
 │   │   └── unit
+│   │       └── .gitkeep
 │   ├── .env.example
 │   ├── package.json
 │   └── tsconfig.json
 ├── frontend
 │   ├── public
 │   │   ├── fonts
+│   │   │   └── .gitkeep
 │   │   ├── icons
+│   │   │   └── .gitkeep
 │   │   └── images
+│   │       └── .gitkeep
 │   ├── src
 │   │   ├── app
 │   │   │   ├── (marketing)
 │   │   │   │   ├── about
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── blog
 │   │   │   │   │   └── [slug]
+│   │   │   │   │       └── .gitkeep
 │   │   │   │   ├── careers
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── contact
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── events
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── faq
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── gallery
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── menu
 │   │   │   │   │   ├── breakfast
+│   │   │   │   │   │   └── .gitkeep
 │   │   │   │   │   ├── desserts
+│   │   │   │   │   │   └── .gitkeep
 │   │   │   │   │   ├── dinner
+│   │   │   │   │   │   └── .gitkeep
 │   │   │   │   │   ├── drinks
+│   │   │   │   │   │   └── .gitkeep
 │   │   │   │   │   └── lunch
+│   │   │   │   │       └── .gitkeep
 │   │   │   │   └── reservations
+│   │   │   │       └── .gitkeep
 │   │   │   ├── account
 │   │   │   │   ├── addresses
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── dashboard
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── orders
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── profile
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   └── reservations
+│   │   │   │       └── .gitkeep
 │   │   │   ├── admin
 │   │   │   │   ├── analytics
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── blogs
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── coupons
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── dashboard
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── inventory
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── menu
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── orders
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── reservations
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── reviews
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   └── users
+│   │   │   │       └── .gitkeep
 │   │   │   ├── api
 │   │   │   │   ├── auth
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── cart
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── chatbot
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── menu
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── newsletter
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── orders
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── reservations
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── reviews
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── uploads
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   └── users
+│   │   │   │       └── .gitkeep
 │   │   │   ├── auth
 │   │   │   │   ├── forgot-password
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── login
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── register
+│   │   │   │   │   └── .gitkeep
 │   │   │   │   └── reset-password
+│   │   │   │       └── .gitkeep
 │   │   │   ├── cart
+│   │   │   │   └── .gitkeep
 │   │   │   ├── checkout
+│   │   │   │   └── .gitkeep
 │   │   │   ├── order
+│   │   │   │   └── .gitkeep
 │   │   │   ├── track-order
-│   │   │   └── wishlist
+│   │   │   │   └── .gitkeep
+│   │   │   ├── wishlist
+│   │   │   │   └── .gitkeep
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
 │   │   ├── components
 │   │   │   ├── about
+│   │   │   │   └── .gitkeep
 │   │   │   ├── admin
+│   │   │   │   └── .gitkeep
 │   │   │   ├── auth
+│   │   │   │   └── .gitkeep
 │   │   │   ├── blog
+│   │   │   │   └── .gitkeep
 │   │   │   ├── cart
+│   │   │   │   └── .gitkeep
 │   │   │   ├── chatbot
+│   │   │   │   └── .gitkeep
 │   │   │   ├── checkout
+│   │   │   │   └── .gitkeep
 │   │   │   ├── dashboard
+│   │   │   │   └── .gitkeep
 │   │   │   ├── gallery
+│   │   │   │   └── .gitkeep
 │   │   │   ├── home
+│   │   │   │   └── .gitkeep
 │   │   │   ├── layout
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── MobileMenu.tsx
+│   │   │   │   └── Navbar.tsx
 │   │   │   ├── menu
+│   │   │   │   └── .gitkeep
 │   │   │   ├── reservations
+│   │   │   │   └── .gitkeep
 │   │   │   ├── shared
+│   │   │   │   ├── LoadingScreen.tsx
+│   │   │   │   ├── ThemeProvider.tsx
+│   │   │   │   └── ThemeToggle.tsx
 │   │   │   └── ui
+│   │   │       └── button.tsx
 │   │   ├── config
+│   │   │   ├── fonts.ts
+│   │   │   └── site.ts
 │   │   ├── lib
 │   │   │   ├── animations
+│   │   │   │   ├── gsap.ts
+│   │   │   │   └── variants.ts
 │   │   │   ├── api
+│   │   │   │   └── .gitkeep
 │   │   │   ├── constants
+│   │   │   │   └── .gitkeep
 │   │   │   ├── hooks
+│   │   │   │   └── useScrollReveal.ts
 │   │   │   ├── store
+│   │   │   │   └── .gitkeep
 │   │   │   ├── utils
+│   │   │   │   └── cn.ts
 │   │   │   └── validations
+│   │   │       └── .gitkeep
 │   │   ├── styles
+│   │   │   └── .gitkeep
 │   │   └── types
+│   │       └── nav.ts
 │   ├── .env.example
+│   ├── eslint.config.js
 │   ├── next.config.ts
 │   ├── package.json
+│   ├── postcss.config.js
 │   ├── tailwind.config.ts
 │   └── tsconfig.json
 ├── .gitignore
+├── ARCHITECTURE.md
+├── CLAUDE_RULES.md
+├── PROJECT_STATUS.md
+├── README.md
 └── package.json

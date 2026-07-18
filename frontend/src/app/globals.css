@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   THEME TOKENS
+   Light = warm cream surface, charcoal ink.
+   Dark  = near-black surface, cream ink.
+   Brand hues (#C62828 / #111111 / #FFD54F) drive
+   both the raw `brand.*` Tailwind classes and the
+   shadcn-style semantic tokens below, so components
+   built from either system stay visually consistent.
+───────────────────────────────────────────────*/
+@layer base {
+  :root {
+    --background: 36 100% 97%;
+    --foreground: 0 0% 7%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+
+    --primary: 0 66% 47%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 36 100% 97%;
+
+    --muted: 36 30% 92%;
+    --muted-foreground: 0 0% 35%;
+
+    --accent: 45 100% 65%;
+    --accent-foreground: 0 0% 7%;
+
+    --destructive: 0 72% 42%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 20% 87%;
+    --input: 36 20% 87%;
+    --ring: 0 66% 47%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 36 40% 96%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 36 40% 96%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 36 40% 96%;
+
+    --primary: 0 72% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 36 40% 96%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 45 100% 65%;
+    --accent-foreground: 0 0% 7%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 45 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-brand-accent text-brand-secondary;
+  }
+
+  /* Visible, brand-colored keyboard focus ring everywhere — accessibility floor */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-brand-primary/40 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-primary/70;
+  }
+}
+
+@layer components {
+  /* Glassmorphism surface — used by the sticky navbar, dialogs, floating cards */
+  .glass {
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-lg border border-white/15 shadow-glass;
+  }
+
+  .glass-light {
+    @apply bg-white/60 dark:bg-black/40 backdrop-blur-md border border-black/5 dark:border-white/10;
+  }
+
+  /* Section container used site-wide for consistent horizontal rhythm */
+  .section-container {
+    @apply container mx-auto px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Eyebrow label — small caps tag above section headings */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-brand-primary dark:text-brand-accent;
+  }
+
+  /* Skip-to-content link, visually hidden until focused */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-brand-primary focus:px-4 focus:py-2 focus:text-white;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-noise {
+    background-image: url("/images/texture-grain.png");
+    background-repeat: repeat;
+  }
+}
