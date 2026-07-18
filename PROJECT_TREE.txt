@@ -168,7 +168,14 @@ MR-SK-EATRIES/
 │   │   │   ├── gallery
 │   │   │   │   └── .gitkeep
 │   │   │   ├── home
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── Categories.tsx
+│   │   │   │   ├── CategoryCard.tsx
+│   │   │   │   ├── FeaturedMeals.tsx
+│   │   │   │   ├── Hero.tsx
+│   │   │   │   ├── MealCard.tsx
+│   │   │   │   ├── StatCounter.tsx
+│   │   │   │   ├── Stats.tsx
+│   │   │   │   └── WhyChooseUs.tsx
 │   │   │   ├── layout
 │   │   │   │   ├── Footer.tsx
 │   │   │   │   ├── MobileMenu.tsx
@@ -179,6 +186,8 @@ MR-SK-EATRIES/
 │   │   │   │   └── .gitkeep
 │   │   │   ├── shared
 │   │   │   │   ├── LoadingScreen.tsx
+│   │   │   │   ├── Rating.tsx
+│   │   │   │   ├── SectionHeading.tsx
 │   │   │   │   ├── ThemeProvider.tsx
 │   │   │   │   └── ThemeToggle.tsx
 │   │   │   └── ui
@@ -193,8 +202,9 @@ MR-SK-EATRIES/
 │   │   │   ├── api
 │   │   │   │   └── .gitkeep
 │   │   │   ├── constants
-│   │   │   │   └── .gitkeep
+│   │   │   │   └── homepage-data.ts
 │   │   │   ├── hooks
+│   │   │   │   ├── useCountUp.ts
 │   │   │   │   └── useScrollReveal.ts
 │   │   │   ├── store
 │   │   │   │   └── .gitkeep
@@ -205,6 +215,8 @@ MR-SK-EATRIES/
 │   │   ├── styles
 │   │   │   └── .gitkeep
 │   │   └── types
+│   │       ├── home.ts
+│   │       ├── menu.ts
 │   │       └── nav.ts
 │   ├── .env.example
 │   ├── eslint.config.js
@@ -217,5 +229,6 @@ MR-SK-EATRIES/
 ├── ARCHITECTURE.md
 ├── CLAUDE_RULES.md
 ├── PROJECT_STATUS.md
+├── PROJECT_TREE.txt
 ├── README.md
 └── package.json
