@@ -1,0 +1,116 @@
+mr-sk-eatries/
+├── backend
+│   ├── logs
+│   ├── src
+│   │   ├── config
+│   │   ├── controllers
+│   │   ├── jobs
+│   │   ├── middleware
+│   │   ├── models
+│   │   ├── routes
+│   │   ├── services
+│   │   ├── sockets
+│   │   ├── types
+│   │   ├── utils
+│   │   └── validators
+│   ├── tests
+│   │   ├── integration
+│   │   └── unit
+│   ├── .env.example
+│   ├── package.json
+│   └── tsconfig.json
+├── frontend
+│   ├── public
+│   │   ├── fonts
+│   │   ├── icons
+│   │   └── images
+│   ├── src
+│   │   ├── app
+│   │   │   ├── (marketing)
+│   │   │   │   ├── about
+│   │   │   │   ├── blog
+│   │   │   │   │   └── [slug]
+│   │   │   │   ├── careers
+│   │   │   │   ├── contact
+│   │   │   │   ├── events
+│   │   │   │   ├── faq
+│   │   │   │   ├── gallery
+│   │   │   │   ├── menu
+│   │   │   │   │   ├── breakfast
+│   │   │   │   │   ├── desserts
+│   │   │   │   │   ├── dinner
+│   │   │   │   │   ├── drinks
+│   │   │   │   │   └── lunch
+│   │   │   │   └── reservations
+│   │   │   ├── account
+│   │   │   │   ├── addresses
+│   │   │   │   ├── dashboard
+│   │   │   │   ├── orders
+│   │   │   │   ├── profile
+│   │   │   │   └── reservations
+│   │   │   ├── admin
+│   │   │   │   ├── analytics
+│   │   │   │   ├── blogs
+│   │   │   │   ├── coupons
+│   │   │   │   ├── dashboard
+│   │   │   │   ├── inventory
+│   │   │   │   ├── menu
+│   │   │   │   ├── orders
+│   │   │   │   ├── reservations
+│   │   │   │   ├── reviews
+│   │   │   │   └── users
+│   │   │   ├── api
+│   │   │   │   ├── auth
+│   │   │   │   ├── cart
+│   │   │   │   ├── chatbot
+│   │   │   │   ├── menu
+│   │   │   │   ├── newsletter
+│   │   │   │   ├── orders
+│   │   │   │   ├── reservations
+│   │   │   │   ├── reviews
+│   │   │   │   ├── uploads
+│   │   │   │   └── users
+│   │   │   ├── auth
+│   │   │   │   ├── forgot-password
+│   │   │   │   ├── login
+│   │   │   │   ├── register
+│   │   │   │   └── reset-password
+│   │   │   ├── cart
+│   │   │   ├── checkout
+│   │   │   ├── order
+│   │   │   ├── track-order
+│   │   │   └── wishlist
+│   │   ├── components
+│   │   │   ├── about
+│   │   │   ├── admin
+│   │   │   ├── auth
+│   │   │   ├── blog
+│   │   │   ├── cart
+│   │   │   ├── chatbot
+│   │   │   ├── checkout
+│   │   │   ├── dashboard
+│   │   │   ├── gallery
+│   │   │   ├── home
+│   │   │   ├── layout
+│   │   │   ├── menu
+│   │   │   ├── reservations
+│   │   │   ├── shared
+│   │   │   └── ui
+│   │   ├── config
+│   │   ├── lib
+│   │   │   ├── animations
+│   │   │   ├── api
+│   │   │   ├── constants
+│   │   │   ├── hooks
+│   │   │   ├── store
+│   │   │   ├── utils
+│   │   │   └── validations
+│   │   ├── styles
+│   │   └── types
+│   ├── .env.example
+│   ├── next.config.ts
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+├── .gitignore
+└── package.json
