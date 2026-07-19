@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Facebook, Instagram, MapPin, Mail, Phone, Send, Twitter } from "lucide-react";
+import { Facebook, Instagram, MapPin, Mail, Phone, Send, Twitter, Clock } from "lucide-react";
 import { FOOTER_LINKS, SITE_CONFIG, SOCIAL_LINKS } from "@/config/site";
 import { Button } from "@/components/ui/button";
+import { BackToTop } from "@/components/shared/BackToTop";
 
 const SOCIAL_ICONS = {
   instagram: Instagram,
@@ -112,6 +113,21 @@ export function Footer() {
             </li>
           </ul>
 
+          <h3 className="mt-6 text-sm font-semibold uppercase tracking-wider text-white/50">
+            Opening Hours
+          </h3>
+          <ul className="mt-3 flex flex-col gap-1.5 text-xs text-white/60">
+            {SITE_CONFIG.hours.map((slot) => (
+              <li key={slot.days} className="flex items-center justify-between gap-4">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 shrink-0 text-brand-accent/70" />
+                  {slot.days}
+                </span>
+                <span>{slot.time}</span>
+              </li>
+            ))}
+          </ul>
+
           <form onSubmit={handleSubscribe} className="mt-6">
             <label htmlFor="footer-newsletter" className="text-sm font-semibold text-white/50">
               Get news &amp; offers
@@ -158,6 +174,8 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      <BackToTop />
     </footer>
   );
 }

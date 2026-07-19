@@ -20,3 +20,15 @@ export interface FoodCategory {
   description: string;
   itemCount: number;
 }
+
+export interface SpecialOffer {
+  id: string;
+  name: string;
+  description: string;
+  category: MenuCategorySlug;
+  originalPrice: number;
+  discountedPrice: number;
+  currency: string;
+  discountPercent: number;
+  badge: string;
+}

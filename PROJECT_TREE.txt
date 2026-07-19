@@ -170,11 +170,18 @@ MR-SK-EATRIES/
 │   │   │   ├── home
 │   │   │   │   ├── Categories.tsx
 │   │   │   │   ├── CategoryCard.tsx
+│   │   │   │   ├── FAQ.tsx
 │   │   │   │   ├── FeaturedMeals.tsx
 │   │   │   │   ├── Hero.tsx
+│   │   │   │   ├── InstagramGallery.tsx
 │   │   │   │   ├── MealCard.tsx
+│   │   │   │   ├── Newsletter.tsx
+│   │   │   │   ├── SpecialCard.tsx
 │   │   │   │   ├── StatCounter.tsx
 │   │   │   │   ├── Stats.tsx
+│   │   │   │   ├── TestimonialCard.tsx
+│   │   │   │   ├── Testimonials.tsx
+│   │   │   │   ├── TodaysSpecials.tsx
 │   │   │   │   └── WhyChooseUs.tsx
 │   │   │   ├── layout
 │   │   │   │   ├── Footer.tsx
@@ -185,12 +192,14 @@ MR-SK-EATRIES/
 │   │   │   ├── reservations
 │   │   │   │   └── .gitkeep
 │   │   │   ├── shared
+│   │   │   │   ├── BackToTop.tsx
 │   │   │   │   ├── LoadingScreen.tsx
 │   │   │   │   ├── Rating.tsx
 │   │   │   │   ├── SectionHeading.tsx
 │   │   │   │   ├── ThemeProvider.tsx
 │   │   │   │   └── ThemeToggle.tsx
 │   │   │   └── ui
+│   │   │       ├── accordion.tsx
 │   │   │       └── button.tsx
 │   │   ├── config
 │   │   │   ├── fonts.ts
@@ -200,9 +209,13 @@ MR-SK-EATRIES/
 │   │   │   │   ├── gsap.ts
 │   │   │   │   └── variants.ts
 │   │   │   ├── api
-│   │   │   │   └── .gitkeep
+│   │   │   │   └── newsletter.ts
 │   │   │   ├── constants
-│   │   │   │   └── homepage-data.ts
+│   │   │   │   ├── faq-data.ts
+│   │   │   │   ├── homepage-data.ts
+│   │   │   │   ├── social-gallery-data.ts
+│   │   │   │   ├── specials-data.ts
+│   │   │   │   └── testimonials-data.ts
 │   │   │   ├── hooks
 │   │   │   │   ├── useCountUp.ts
 │   │   │   │   └── useScrollReveal.ts
@@ -211,13 +224,15 @@ MR-SK-EATRIES/
 │   │   │   ├── utils
 │   │   │   │   └── cn.ts
 │   │   │   └── validations
-│   │   │       └── .gitkeep
+│   │   │       └── newsletter.ts
 │   │   ├── styles
 │   │   │   └── .gitkeep
 │   │   └── types
+│   │       ├── faq.ts
 │   │       ├── home.ts
 │   │       ├── menu.ts
-│   │       └── nav.ts
+│   │       ├── nav.ts
+│   │       └── testimonial.ts
 │   ├── .env.example
 │   ├── eslint.config.js
 │   ├── next.config.ts

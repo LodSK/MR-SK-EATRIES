@@ -1,0 +1,37 @@
+import type { SpecialOffer } from "@/types/menu";
+
+export const TODAYS_SPECIALS: SpecialOffer[] = [
+  {
+    id: "special-brisket-bowl",
+    name: "Smoked Brisket Bowl",
+    description: "12-hour smoked brisket, charred corn, pickled onion, chili oil.",
+    category: "dinner",
+    originalPrice: 68,
+    discountedPrice: 51,
+    currency: "GHS",
+    discountPercent: 25,
+    badge: "Today Only",
+  },
+  {
+    id: "special-seafood-risotto",
+    name: "Saffron Seafood Risotto",
+    description: "Prawns, calamari, and mussels folded into a saffron arborio risotto.",
+    category: "dinner",
+    originalPrice: 82,
+    discountedPrice: 66,
+    currency: "GHS",
+    discountPercent: 20,
+    badge: "Limited Time",
+  },
+  {
+    id: "special-old-fashioned",
+    name: "Smoked Old Fashioned",
+    description: "Bourbon, house bitters, orange oil, finished with cherrywood smoke.",
+    category: "drinks",
+    originalPrice: 42,
+    discountedPrice: 32,
+    currency: "GHS",
+    discountPercent: 24,
+    badge: "Happy Hour",
+  },
+];

@@ -20,8 +20,8 @@ A recovery pass consolidated Sprint 1 (architecture/config) and Sprint 2 (UI/lay
 | 2 | Layouts, theme, navbar, footer, global styles, loading screen, animations | ✅ Complete |
 | — | **Foundation Recovery Sprint** (consolidation + packaging) | ✅ Complete |
 | 3 | Homepage: Hero, CTA, Featured Meals, Story, Featured Categories, Why Choose Us | ✅ Complete |
-| 4 | Homepage remainder: Testimonials, Newsletter, Instagram, Gallery Preview, Footer polish | ⏭ Next |
-| 5 | About Page: Story, Mission, Vision, Timeline, Team | Pending |
+| 4 | Homepage remainder: Testimonials, Newsletter, Instagram, Gallery Preview, Footer polish | ✅ Complete |
+| 5 | About Page: Story, Mission, Vision, Timeline, Team | ⏭ Next |
 | 6 | Menu System: Categories, Cards, Filtering, Search, Sorting | Pending |
 | 7 | Cart, Wishlist, Checkout, Coupons, Order Summary | Pending |
 | 8 | Auth: Register, Login, Forgot Password, JWT, Google Login architecture | Pending |
@@ -42,16 +42,18 @@ A recovery pass consolidated Sprint 1 (architecture/config) and Sprint 2 (UI/lay
 
 ### `frontend/`
 - `package.json` · `tsconfig.json` · `next.config.ts` · `tailwind.config.ts` · `postcss.config.js` · `eslint.config.js` · `.env.example`
-- `src/app/layout.tsx` · `src/app/page.tsx` (full homepage, Sprint 3) · `src/app/loading.tsx` · `src/app/globals.css`
+- `src/app/layout.tsx` · `src/app/page.tsx` (full homepage, Sprints 3–4) · `src/app/loading.tsx` · `src/app/globals.css`
 - Full route-folder tree scaffolded (empty, awaiting content) under `src/app/`: `(marketing)/{about,menu/*,reservations,gallery,events,blog/[slug],contact,faq,careers}`, `account/*`, `admin/*`, `auth/*`, `api/*`, `cart`, `checkout`, `order`, `track-order`, `wishlist`
-- `src/components/layout/{Navbar,MobileMenu,Footer}.tsx`
-- `src/components/shared/{ThemeProvider,ThemeToggle,LoadingScreen,Rating,SectionHeading}.tsx`
-- `src/components/home/{Hero,FeaturedMeals,MealCard,Categories,CategoryCard,WhyChooseUs,Stats,StatCounter}.tsx`
-- `src/components/ui/button.tsx`
+- `src/components/layout/{Navbar,MobileMenu,Footer}.tsx` (Footer extended in Sprint 4: opening hours, back-to-top)
+- `src/components/shared/{ThemeProvider,ThemeToggle,LoadingScreen,Rating,SectionHeading,BackToTop}.tsx`
+- `src/components/home/{Hero,FeaturedMeals,MealCard,Categories,CategoryCard,WhyChooseUs,Stats,StatCounter,TodaysSpecials,SpecialCard,Testimonials,TestimonialCard,InstagramGallery,Newsletter,FAQ}.tsx`
+- `src/components/ui/{button,accordion}.tsx`
 - Empty scaffolded folders awaiting content: `components/{menu,cart,checkout,reservations,about,gallery,blog,dashboard,admin,auth,chatbot}`
-- `src/config/{site,fonts}.ts` · `src/types/{nav,menu,home}.ts`
-- `src/lib/utils/cn.ts` · `src/lib/animations/{variants,gsap}.ts` · `src/lib/hooks/{useScrollReveal,useCountUp}.ts` · `src/lib/constants/homepage-data.ts`
-- Empty scaffolded folders awaiting content: `lib/{api,validations,store}`
+- `src/config/{site,fonts}.ts` · `src/types/{nav,menu,home,testimonial,faq}.ts`
+- `src/lib/utils/cn.ts` · `src/lib/animations/{variants,gsap}.ts` · `src/lib/hooks/{useScrollReveal,useCountUp}.ts`
+- `src/lib/constants/{homepage-data,testimonials-data,social-gallery-data,specials-data,faq-data}.ts`
+- `src/lib/api/newsletter.ts` · `src/lib/validations/newsletter.ts`
+- Empty scaffolded folder awaiting content: `lib/store`
 
 ### `backend/`
 - `package.json` · `tsconfig.json` · `.env.example`
@@ -62,10 +64,11 @@ A recovery pass consolidated Sprint 1 (architecture/config) and Sprint 2 (UI/lay
 ## Known Limitations (by design, until later sprints)
 
 - Backend has no server entrypoint yet (`src/server.ts` doesn't exist until Sprint 9) — `npm run dev:backend` will not start a server today.
-- Homepage sections use static, in-repo data (`lib/constants/homepage-data.ts`) — swapped for live API data (TanStack Query → Express) in Sprint 6 (menu) / Sprint 9 (backend). Data shapes already match the future API contract so this is a data-source swap, not a component rewrite.
-- Meal/category cards use designed gradient-and-icon placeholders instead of real photography — swapped for actual food photography (via Cloudinary) once assets are supplied; no external image domains were added to avoid depending on network access this build has none of.
+- Homepage sections use static, in-repo data (`lib/constants/*.ts`: meals, categories, specials, testimonials, social posts, FAQs) — swapped for live API data (TanStack Query → Express) in Sprint 6 (menu), Sprint 9 (backend/reviews), and Sprint 13 (as applicable). Data shapes already match the future API contract so this is a data-source swap, not a component rewrite.
+- Meal/category/special/gallery cards use designed gradient-and-icon placeholders instead of real photography — swapped for actual food photography (via Cloudinary) once assets are supplied; no external image domains were added to avoid depending on network access this build has none of.
+- Instagram gallery links to the real profile URL from `site.ts` but tile content is placeholder — swapped for a live Instagram Graph API feed in a later sprint.
 - Cart icon badge in the Navbar is static (0) — wired to the Zustand cart store in Sprint 7.
-- Newsletter form in the Footer simulates submission client-side — wired to `POST /api/v1/newsletter` in Sprint 9.
+- Both newsletter forms (Footer shortcut + homepage Newsletter section) call `lib/api/newsletter.ts`, which simulates a network call — its internals (not its signature) are replaced with a real `POST /api/v1/newsletter` call in Sprint 9.
 - No `node_modules` are included in delivered ZIPs — this sandbox has no network access to run `npm install`, so dependency installation must happen on the developer's machine. See "Verification Method" below.
 
 ---
@@ -84,4 +87,4 @@ Once `npm install` is run in a networked environment, `npm run dev` is expected 
 
 ## Next Sprint
 
-**Sprint 4** — Homepage remainder: Testimonials, Newsletter (dedicated section), Instagram feed, Gallery Preview, Footer polish.
+**Sprint 5** — About Page: Restaurant Story, Mission, Vision, Timeline, Team.
