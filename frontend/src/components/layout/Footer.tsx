@@ -2,33 +2,31 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Facebook, Instagram, MapPin, Mail, Phone, Send, Twitter, Clock } from "lucide-react";
+import { MapPin, Mail, Phone, Send, Clock } from "lucide-react";
 import { FOOTER_LINKS, SITE_CONFIG, SOCIAL_LINKS } from "@/config/site";
+import { SOCIAL_ICON_MAP } from "@/lib/constants/social-icons";
+import { subscribeToNewsletter } from "@/lib/api/newsletter";
 import { Button } from "@/components/ui/button";
 import { BackToTop } from "@/components/shared/BackToTop";
 
-const SOCIAL_ICONS = {
-  instagram: Instagram,
-  facebook: Facebook,
-  twitter: Twitter,
-  // TikTok/YouTube icons wired in when brand assets/routes for those land
-  tiktok: Instagram,
-  youtube: Instagram,
-} as const;
-
 export function Footer() {
   const [email, setEmail] = React.useState("");
-  const [status, setStatus] = React.useState<"idle" | "submitting" | "success">("idle");
+  const [status, setStatus] = React.useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  function handleSubscribe(e: React.FormEvent) {
+  async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setStatus("submitting");
-    // Wired to POST /api/v1/newsletter in the backend sprint — placeholder for now.
-    window.setTimeout(() => {
+    setErrorMessage(null);
+    try {
+      await subscribeToNewsletter(email);
       setStatus("success");
       setEmail("");
-    }, 600);
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+    }
   }
 
   return (
@@ -48,7 +46,7 @@ export function Footer() {
 
           <div className="mt-6 flex items-center gap-3">
             {SOCIAL_LINKS.map((social) => {
-              const Icon = SOCIAL_ICONS[social.icon];
+              const Icon = SOCIAL_ICON_MAP[social.icon];
               return (
                 <a
                   key={social.label}
@@ -68,9 +66,9 @@ export function Footer() {
         {/* Link columns */}
         {FOOTER_LINKS.map((column) => (
           <div key={column.title}>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-white/50">
               {column.title}
-            </h3>
+            </h2>
             <ul className="mt-4 flex flex-col gap-3">
               {column.items.map((item) => (
                 <li key={item.href}>
@@ -88,9 +86,9 @@ export function Footer() {
 
         {/* Contact + Newsletter */}
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-white/50">
             Visit Us
-          </h3>
+          </h2>
           <ul className="mt-4 flex flex-col gap-3 text-sm text-white/75">
             <li className="flex items-start gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-accent" />
@@ -156,6 +154,9 @@ export function Footer() {
               <p className="mt-2 text-xs text-brand-accent">
                 You&apos;re on the list — welcome!
               </p>
+            )}
+            {status === "error" && errorMessage && (
+              <p className="mt-2 text-xs text-red-400">{errorMessage}</p>
             )}
           </form>
         </div>

@@ -1,6 +1,7 @@
 import { Quote } from "lucide-react";
 import type { Testimonial } from "@/types/testimonial";
 import { Rating } from "@/components/shared/Rating";
+import { InitialsAvatar } from "@/components/shared/InitialsAvatar";
 
 interface TestimonialCardProps {
   testimonial: Testimonial;
@@ -16,12 +17,7 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
       </p>
 
       <div className="flex items-center gap-3 border-t border-border pt-5">
-        <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-secondary text-sm font-bold text-brand-accent"
-          aria-hidden="true"
-        >
-          {testimonial.avatarInitials}
-        </div>
+        <InitialsAvatar initials={testimonial.avatarInitials} size="sm" />
         <div>
           <p className="text-sm font-semibold">{testimonial.name}</p>
           <p className="text-xs text-muted-foreground">{testimonial.role}</p>

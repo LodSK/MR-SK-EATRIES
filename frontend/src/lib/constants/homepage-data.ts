@@ -2,18 +2,13 @@ import {
   Award,
   ChefHat,
   Clock,
-  Coffee,
-  GlassWater,
   HeartHandshake,
-  IceCream2,
   Leaf,
-  Sandwich,
   ShieldCheck,
   Soup,
   Sparkles,
   Timer,
   Users,
-  UtensilsCrossed,
 } from "lucide-react";
 import type { FeaturedMeal, FoodCategory } from "@/types/menu";
 import type { StatItem, WhyChooseUsItem } from "@/types/home";
@@ -170,10 +165,10 @@ export const HOME_STATS: StatItem[] = [
   { icon: Award, value: 18, suffix: "+", label: "Awards Won" },
 ];
 
-export const CATEGORY_ICON: Record<FoodCategory["slug"], typeof UtensilsCrossed> = {
-  breakfast: Coffee,
-  lunch: Sandwich,
-  dinner: UtensilsCrossed,
-  desserts: IceCream2,
-  drinks: GlassWater,
-};
+/**
+ * Re-exported from the shared source of truth so existing imports
+ * (`import { CATEGORY_ICON } from "@/lib/constants/homepage-data"`)
+ * across Sprint 3/4 components keep working unchanged, now covering
+ * all 9 menu categories introduced in Sprint 6.
+ */
+export { CATEGORY_ICON } from "@/lib/constants/category-icons";

@@ -4,27 +4,120 @@ MR-SK-EATRIES/
 │   │   └── .gitkeep
 │   ├── src
 │   │   ├── config
-│   │   │   └── .gitkeep
+│   │   │   ├── constants.ts
+│   │   │   └── env.ts
 │   │   ├── controllers
-│   │   │   └── .gitkeep
+│   │   │   ├── admin.controller.ts
+│   │   │   ├── ai.controller.ts
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── cart.controller.ts
+│   │   │   ├── coupon.controller.ts
+│   │   │   ├── menu.controller.ts
+│   │   │   ├── newsletter.controller.ts
+│   │   │   ├── notification.controller.ts
+│   │   │   ├── order.controller.ts
+│   │   │   ├── payment-method.controller.ts
+│   │   │   ├── reservation.controller.ts
+│   │   │   ├── review.controller.ts
+│   │   │   ├── settings.controller.ts
+│   │   │   ├── upload.controller.ts
+│   │   │   ├── user.controller.ts
+│   │   │   └── wishlist.controller.ts
+│   │   ├── database
+│   │   │   └── connect.ts
 │   │   ├── jobs
 │   │   │   └── .gitkeep
 │   │   ├── middleware
-│   │   │   └── .gitkeep
+│   │   │   ├── auth.middleware.ts
+│   │   │   ├── error.middleware.ts
+│   │   │   ├── rateLimiter.middleware.ts
+│   │   │   ├── upload.middleware.ts
+│   │   │   └── validate.middleware.ts
 │   │   ├── models
-│   │   │   └── .gitkeep
+│   │   │   ├── Category.model.ts
+│   │   │   ├── Coupon.model.ts
+│   │   │   ├── MenuItem.model.ts
+│   │   │   ├── NewsletterSubscriber.model.ts
+│   │   │   ├── Notification.model.ts
+│   │   │   ├── Order.model.ts
+│   │   │   ├── OrderItem.model.ts
+│   │   │   ├── PaymentMethod.model.ts
+│   │   │   ├── Reservation.model.ts
+│   │   │   ├── Review.model.ts
+│   │   │   ├── Settings.model.ts
+│   │   │   ├── User.model.ts
+│   │   │   ├── Wishlist.model.ts
+│   │   │   └── index.ts
 │   │   ├── routes
-│   │   │   └── .gitkeep
+│   │   │   ├── admin.routes.ts
+│   │   │   ├── ai.routes.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── cart.routes.ts
+│   │   │   ├── coupon.routes.ts
+│   │   │   ├── index.ts
+│   │   │   ├── menu.routes.ts
+│   │   │   ├── newsletter.routes.ts
+│   │   │   ├── notification.routes.ts
+│   │   │   ├── order.routes.ts
+│   │   │   ├── payment-method.routes.ts
+│   │   │   ├── reservation.routes.ts
+│   │   │   ├── review.routes.ts
+│   │   │   ├── settings.routes.ts
+│   │   │   ├── upload.routes.ts
+│   │   │   ├── user.routes.ts
+│   │   │   └── wishlist.routes.ts
+│   │   ├── scripts
+│   │   │   └── diagnose-auth.ts
+│   │   ├── seed
+│   │   │   ├── seed.ts
+│   │   │   └── seedData.ts
 │   │   ├── services
-│   │   │   └── .gitkeep
+│   │   │   ├── ai
+│   │   │   │   ├── ai-provider.factory.ts
+│   │   │   │   ├── ai-provider.interface.ts
+│   │   │   │   ├── ai.service.ts
+│   │   │   │   ├── claude.provider.ts
+│   │   │   │   ├── conversation-memory.service.ts
+│   │   │   │   ├── intent-classifier.service.ts
+│   │   │   │   ├── prediction.service.ts
+│   │   │   │   ├── prompt-templates.ts
+│   │   │   │   ├── recommendation-engine.service.ts
+│   │   │   │   └── semantic-search.service.ts
+│   │   │   ├── analytics.service.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── cart.service.ts
+│   │   │   ├── coupon.service.ts
+│   │   │   ├── email.service.ts
+│   │   │   ├── menu.service.ts
+│   │   │   ├── order.service.ts
+│   │   │   ├── payment-method.service.ts
+│   │   │   ├── reservation.service.ts
+│   │   │   ├── settings.service.ts
+│   │   │   └── user.service.ts
 │   │   ├── sockets
 │   │   │   └── .gitkeep
 │   │   ├── types
-│   │   │   └── .gitkeep
+│   │   │   ├── ai.ts
+│   │   │   └── express.d.ts
 │   │   ├── utils
-│   │   │   └── .gitkeep
-│   │   └── validators
-│   │       └── .gitkeep
+│   │   │   ├── ApiError.ts
+│   │   │   ├── ApiResponse.ts
+│   │   │   ├── asyncHandler.ts
+│   │   │   ├── jwt.ts
+│   │   │   ├── password.ts
+│   │   │   └── slugify.ts
+│   │   ├── validators
+│   │   │   ├── ai.validator.ts
+│   │   │   ├── auth.validator.ts
+│   │   │   ├── coupon.validator.ts
+│   │   │   ├── menu.validator.ts
+│   │   │   ├── order.validator.ts
+│   │   │   ├── payment-method.validator.ts
+│   │   │   ├── reservation.validator.ts
+│   │   │   ├── settings.validator.ts
+│   │   │   └── user.validator.ts
+│   │   ├── app.ts
+│   │   └── server.ts
 │   ├── tests
 │   │   ├── integration
 │   │   │   └── .gitkeep
@@ -45,7 +138,7 @@ MR-SK-EATRIES/
 │   │   ├── app
 │   │   │   ├── (marketing)
 │   │   │   │   ├── about
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── blog
 │   │   │   │   │   └── [slug]
 │   │   │   │   │       └── .gitkeep
@@ -60,50 +153,68 @@ MR-SK-EATRIES/
 │   │   │   │   ├── gallery
 │   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── menu
-│   │   │   │   │   ├── breakfast
-│   │   │   │   │   │   └── .gitkeep
-│   │   │   │   │   ├── desserts
-│   │   │   │   │   │   └── .gitkeep
-│   │   │   │   │   ├── dinner
-│   │   │   │   │   │   └── .gitkeep
-│   │   │   │   │   ├── drinks
-│   │   │   │   │   │   └── .gitkeep
-│   │   │   │   │   └── lunch
-│   │   │   │   │       └── .gitkeep
+│   │   │   │   │   ├── [category]
+│   │   │   │   │   │   ├── [slug]
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── loading.tsx
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── loading.tsx
+│   │   │   │   │   └── page.tsx
 │   │   │   │   └── reservations
-│   │   │   │       └── .gitkeep
+│   │   │   │       └── page.tsx
 │   │   │   ├── account
 │   │   │   │   ├── addresses
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── dashboard
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── favorites
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── notifications
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── orders
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   ├── [id]
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── payment-methods
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── profile
-│   │   │   │   │   └── .gitkeep
-│   │   │   │   └── reservations
-│   │   │   │       └── .gitkeep
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reservations
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── security
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── settings
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── layout.tsx
 │   │   │   ├── admin
 │   │   │   │   ├── analytics
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── blogs
 │   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── coupons
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── dashboard
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── inventory
 │   │   │   │   │   └── .gitkeep
 │   │   │   │   ├── menu
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── notifications
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── orders
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── reservations
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── reviews
 │   │   │   │   │   └── .gitkeep
-│   │   │   │   └── users
-│   │   │   │       └── .gitkeep
+│   │   │   │   ├── settings
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── users
+│   │   │   │   │   ├── [id]
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── layout.tsx
+│   │   │   │   └── page.tsx
 │   │   │   ├── api
 │   │   │   │   ├── auth
 │   │   │   │   │   └── .gitkeep
@@ -127,19 +238,27 @@ MR-SK-EATRIES/
 │   │   │   │       └── .gitkeep
 │   │   │   ├── auth
 │   │   │   │   ├── forgot-password
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── login
-│   │   │   │   │   └── .gitkeep
+│   │   │   │   │   └── page.tsx
 │   │   │   │   ├── register
-│   │   │   │   │   └── .gitkeep
-│   │   │   │   └── reset-password
-│   │   │   │       └── .gitkeep
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reset-password
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── verify-email
+│   │   │   │       └── page.tsx
 │   │   │   ├── cart
-│   │   │   │   └── .gitkeep
+│   │   │   │   └── page.tsx
 │   │   │   ├── checkout
-│   │   │   │   └── .gitkeep
+│   │   │   │   └── page.tsx
+│   │   │   ├── dashboard
+│   │   │   │   └── page.tsx
 │   │   │   ├── order
 │   │   │   │   └── .gitkeep
+│   │   │   ├── profile
+│   │   │   │   └── page.tsx
+│   │   │   ├── settings
+│   │   │   │   └── page.tsx
 │   │   │   ├── track-order
 │   │   │   │   └── .gitkeep
 │   │   │   ├── wishlist
@@ -150,21 +269,111 @@ MR-SK-EATRIES/
 │   │   │   └── page.tsx
 │   │   ├── components
 │   │   │   ├── about
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── AboutCTA.tsx
+│   │   │   │   ├── AboutHero.tsx
+│   │   │   │   ├── AwardCard.tsx
+│   │   │   │   ├── AwardsRecognition.tsx
+│   │   │   │   ├── ChefCard.tsx
+│   │   │   │   ├── JourneyTimeline.tsx
+│   │   │   │   ├── MeetOurChefs.tsx
+│   │   │   │   ├── OurStory.tsx
+│   │   │   │   ├── TrustIndicatorCard.tsx
+│   │   │   │   └── WhyCustomersLoveUs.tsx
 │   │   │   ├── admin
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── AdminAnalytics.tsx
+│   │   │   │   ├── AdminCoupons.tsx
+│   │   │   │   ├── AdminCustomerDetail.tsx
+│   │   │   │   ├── AdminCustomers.tsx
+│   │   │   │   ├── AdminMenu.tsx
+│   │   │   │   ├── AdminNotificationCenter.tsx
+│   │   │   │   ├── AdminOrders.tsx
+│   │   │   │   ├── AdminOverview.tsx
+│   │   │   │   ├── AdminReservations.tsx
+│   │   │   │   ├── AdminSearchBar.tsx
+│   │   │   │   ├── AdminSettings.tsx
+│   │   │   │   ├── AnalyticsAreaChart.tsx
+│   │   │   │   ├── CouponForm.tsx
+│   │   │   │   ├── MenuItemForm.tsx
+│   │   │   │   ├── OrderStatusActions.tsx
+│   │   │   │   ├── PopularMealsList.tsx
+│   │   │   │   └── RescheduleReservationForm.tsx
+│   │   │   ├── ai
+│   │   │   │   ├── ChatButton.tsx
+│   │   │   │   ├── ChatInput.tsx
+│   │   │   │   ├── ChatMessageBubble.tsx
+│   │   │   │   ├── ChatMessageList.tsx
+│   │   │   │   ├── ChatPanel.tsx
+│   │   │   │   ├── ChatWidget.tsx
+│   │   │   │   ├── ChatWidgetLoader.tsx
+│   │   │   │   ├── ReservationConfirmationCard.tsx
+│   │   │   │   └── TypingIndicator.tsx
 │   │   │   ├── auth
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── AuthLayout.tsx
+│   │   │   │   ├── AuthProvider.tsx
+│   │   │   │   ├── AvatarUploader.tsx
+│   │   │   │   ├── ChangePasswordForm.tsx
+│   │   │   │   ├── EmailVerificationNotice.tsx
+│   │   │   │   ├── ForgotPasswordForm.tsx
+│   │   │   │   ├── FormMessage.tsx
+│   │   │   │   ├── GuestRoute.tsx
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   ├── PasswordInput.tsx
+│   │   │   │   ├── PasswordStrength.tsx
+│   │   │   │   ├── ProfileAvatar.tsx
+│   │   │   │   ├── ProfileForm.tsx
+│   │   │   │   ├── ProfilePageContent.tsx
+│   │   │   │   ├── ProtectedRoute.tsx
+│   │   │   │   ├── RegisterForm.tsx
+│   │   │   │   ├── RememberMeCheckbox.tsx
+│   │   │   │   ├── ResetPasswordForm.tsx
+│   │   │   │   ├── SettingsPageContent.tsx
+│   │   │   │   ├── UserDropdown.tsx
+│   │   │   │   └── VerifyEmailContent.tsx
 │   │   │   ├── blog
 │   │   │   │   └── .gitkeep
 │   │   │   ├── cart
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── CartDrawer.tsx
+│   │   │   │   ├── CartItem.tsx
+│   │   │   │   ├── CartPageContent.tsx
+│   │   │   │   ├── CartProvider.tsx
+│   │   │   │   ├── CartSummary.tsx
+│   │   │   │   ├── CheckoutForm.tsx
+│   │   │   │   ├── CheckoutPageContent.tsx
+│   │   │   │   ├── CouponInput.tsx
+│   │   │   │   ├── DeliverySelector.tsx
+│   │   │   │   ├── EmptyCart.tsx
+│   │   │   │   ├── MiniCartBadge.tsx
+│   │   │   │   ├── OrderSummary.tsx
+│   │   │   │   ├── PaymentSelector.tsx
+│   │   │   │   └── PriceBreakdown.tsx
 │   │   │   ├── chatbot
 │   │   │   │   └── .gitkeep
 │   │   │   ├── checkout
 │   │   │   │   └── .gitkeep
 │   │   │   ├── dashboard
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── AddressCard.tsx
+│   │   │   │   ├── AddressForm.tsx
+│   │   │   │   ├── DashboardAddresses.tsx
+│   │   │   │   ├── DashboardCard.tsx
+│   │   │   │   ├── DashboardFavorites.tsx
+│   │   │   │   ├── DashboardHeader.tsx
+│   │   │   │   ├── DashboardNotificationsSettings.tsx
+│   │   │   │   ├── DashboardOrders.tsx
+│   │   │   │   ├── DashboardOverview.tsx
+│   │   │   │   ├── DashboardPaymentMethods.tsx
+│   │   │   │   ├── DashboardProfile.tsx
+│   │   │   │   ├── DashboardSecurity.tsx
+│   │   │   │   ├── DashboardSettings.tsx
+│   │   │   │   ├── DashboardSidebar.tsx
+│   │   │   │   ├── FavoriteCard.tsx
+│   │   │   │   ├── OrderCard.tsx
+│   │   │   │   ├── OrderDetails.tsx
+│   │   │   │   ├── OrderDetailsPageContent.tsx
+│   │   │   │   ├── PaymentMethodCard.tsx
+│   │   │   │   ├── PaymentMethodForm.tsx
+│   │   │   │   ├── QuickActionCard.tsx
+│   │   │   │   ├── RecentActivity.tsx
+│   │   │   │   └── StatCard.tsx
 │   │   │   ├── gallery
 │   │   │   │   └── .gitkeep
 │   │   │   ├── home
@@ -188,19 +397,51 @@ MR-SK-EATRIES/
 │   │   │   │   ├── MobileMenu.tsx
 │   │   │   │   └── Navbar.tsx
 │   │   │   ├── menu
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── CategoryFilter.tsx
+│   │   │   │   ├── FilterPanel.tsx
+│   │   │   │   ├── IngredientList.tsx
+│   │   │   │   ├── MealDetails.tsx
+│   │   │   │   ├── MealGallery.tsx
+│   │   │   │   ├── MenuBrowser.tsx
+│   │   │   │   ├── MenuCard.tsx
+│   │   │   │   ├── MenuCardSkeleton.tsx
+│   │   │   │   ├── MenuGrid.tsx
+│   │   │   │   ├── NutritionCard.tsx
+│   │   │   │   ├── PriceTag.tsx
+│   │   │   │   ├── QuantitySelector.tsx
+│   │   │   │   ├── RelatedMeals.tsx
+│   │   │   │   ├── SearchBar.tsx
+│   │   │   │   └── SortDropdown.tsx
 │   │   │   ├── reservations
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── AvailabilitySelector.tsx
+│   │   │   │   ├── MyReservations.tsx
+│   │   │   │   ├── OpeningHoursCard.tsx
+│   │   │   │   ├── ReservationConfirmation.tsx
+│   │   │   │   ├── ReservationForm.tsx
+│   │   │   │   ├── ReservationGuidelines.tsx
+│   │   │   │   ├── ReservationPageContent.tsx
+│   │   │   │   ├── ReservationStatusBadge.tsx
+│   │   │   │   └── ReservationSummaryCard.tsx
 │   │   │   ├── shared
 │   │   │   │   ├── BackToTop.tsx
+│   │   │   │   ├── Badge.tsx
+│   │   │   │   ├── Breadcrumb.tsx
+│   │   │   │   ├── EmptyState.tsx
+│   │   │   │   ├── InitialsAvatar.tsx
 │   │   │   │   ├── LoadingScreen.tsx
+│   │   │   │   ├── PageHero.tsx
 │   │   │   │   ├── Rating.tsx
 │   │   │   │   ├── SectionHeading.tsx
+│   │   │   │   ├── Skeleton.tsx
 │   │   │   │   ├── ThemeProvider.tsx
 │   │   │   │   └── ThemeToggle.tsx
 │   │   │   └── ui
 │   │   │       ├── accordion.tsx
-│   │   │       └── button.tsx
+│   │   │       ├── button.tsx
+│   │   │       ├── checkbox.tsx
+│   │   │       ├── dropdown-menu.tsx
+│   │   │       ├── select.tsx
+│   │   │       └── slider.tsx
 │   │   ├── config
 │   │   │   ├── fonts.ts
 │   │   │   └── site.ts
@@ -209,29 +450,81 @@ MR-SK-EATRIES/
 │   │   │   │   ├── gsap.ts
 │   │   │   │   └── variants.ts
 │   │   │   ├── api
-│   │   │   │   └── newsletter.ts
+│   │   │   │   ├── addresses.ts
+│   │   │   │   ├── admin.ts
+│   │   │   │   ├── adminMenu.ts
+│   │   │   │   ├── adminUsers.ts
+│   │   │   │   ├── ai.ts
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── cart.ts
+│   │   │   │   ├── coupons.ts
+│   │   │   │   ├── dashboard.ts
+│   │   │   │   ├── favorites.ts
+│   │   │   │   ├── httpClient.ts
+│   │   │   │   ├── menu.ts
+│   │   │   │   ├── newsletter.ts
+│   │   │   │   ├── orders.ts
+│   │   │   │   ├── paymentMethods.ts
+│   │   │   │   ├── reservation.ts
+│   │   │   │   ├── settings.ts
+│   │   │   │   └── upload.ts
 │   │   │   ├── constants
+│   │   │   │   ├── about-data.ts
+│   │   │   │   ├── admin-nav.ts
+│   │   │   │   ├── category-icons.ts
+│   │   │   │   ├── dashboard-nav.ts
 │   │   │   │   ├── faq-data.ts
 │   │   │   │   ├── homepage-data.ts
+│   │   │   │   ├── menu-data.ts
+│   │   │   │   ├── reservation-data.ts
 │   │   │   │   ├── social-gallery-data.ts
+│   │   │   │   ├── social-icons.ts
 │   │   │   │   ├── specials-data.ts
 │   │   │   │   └── testimonials-data.ts
 │   │   │   ├── hooks
+│   │   │   │   ├── useAI.ts
+│   │   │   │   ├── useAuth.ts
+│   │   │   │   ├── useCart.ts
 │   │   │   │   ├── useCountUp.ts
+│   │   │   │   ├── useDebouncedValue.ts
+│   │   │   │   ├── useReducedMotion.ts
 │   │   │   │   └── useScrollReveal.ts
 │   │   │   ├── store
-│   │   │   │   └── .gitkeep
+│   │   │   │   ├── authStore.ts
+│   │   │   │   └── cartStore.ts
 │   │   │   ├── utils
-│   │   │   │   └── cn.ts
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── cart.ts
+│   │   │   │   ├── cartStorage.ts
+│   │   │   │   ├── cn.ts
+│   │   │   │   ├── filterMenuItems.ts
+│   │   │   │   ├── session.ts
+│   │   │   │   └── token.ts
 │   │   │   └── validations
-│   │   │       └── newsletter.ts
+│   │   │       ├── address.ts
+│   │   │       ├── auth.ts
+│   │   │       ├── checkout.ts
+│   │   │       ├── newsletter.ts
+│   │   │       └── reservation.ts
 │   │   ├── styles
 │   │   │   └── .gitkeep
 │   │   └── types
+│   │       ├── about.ts
+│   │       ├── address.ts
+│   │       ├── admin.ts
+│   │       ├── ai.ts
+│   │       ├── auth.ts
+│   │       ├── cart.ts
+│   │       ├── coupon.ts
+│   │       ├── dashboard.ts
 │   │       ├── faq.ts
 │   │       ├── home.ts
 │   │       ├── menu.ts
 │   │       ├── nav.ts
+│   │       ├── order.ts
+│   │       ├── paymentMethod.ts
+│   │       ├── reservation.ts
+│   │       ├── settings.ts
 │   │       └── testimonial.ts
 │   ├── .env.example
 │   ├── eslint.config.js
@@ -239,7 +532,8 @@ MR-SK-EATRIES/
 │   ├── package.json
 │   ├── postcss.config.js
 │   ├── tailwind.config.ts
-│   └── tsconfig.json
+│   ├── tsconfig.json
+│   └── tsconfig.tsbuildinfo
 ├── .gitignore
 ├── ARCHITECTURE.md
 ├── CLAUDE_RULES.md

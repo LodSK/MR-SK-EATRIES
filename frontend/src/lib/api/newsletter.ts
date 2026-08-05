@@ -1,23 +1,20 @@
+import { httpClient, getApiErrorMessage } from "@/lib/api/httpClient";
+
 export interface NewsletterSubscribeResponse {
   success: boolean;
   message: string;
 }
 
 /**
- * Placeholder implementation. In Sprint 9 this function's body is replaced
- * with a real `axios.post(`${API_BASE_URL}/newsletter`, { email })` call
- * against the Express backend — the signature and return shape are already
- * final, so no calling component needs to change when that happens.
+ * Sprint 9: real Express/MongoDB backend replaces the Sprint 4 placeholder.
+ * Signature and return shape are unchanged, exactly as promised — no
+ * calling component (Footer, homepage Newsletter section) needed to change.
  */
 export async function subscribeToNewsletter(email: string): Promise<NewsletterSubscribeResponse> {
-  await new Promise((resolve) => setTimeout(resolve, 900));
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error("Please enter a valid email address.");
+  try {
+    const { data } = await httpClient.post("/newsletter/subscribe", { email });
+    return { success: true, message: data.message };
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error, "Please enter a valid email address."));
   }
-
-  return {
-    success: true,
-    message: "You're on the list — welcome to MR_SK EATRIES!",
-  };
 }

@@ -1,19 +1,22 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Flame } from "lucide-react";
 import type { SpecialOffer } from "@/types/menu";
-import { CATEGORY_ICON } from "@/lib/constants/homepage-data";
+import { CATEGORY_IMAGE } from "@/lib/constants/media";
 import { Button } from "@/components/ui/button";
 import { fadeUp } from "@/lib/animations/variants";
+import { useCart } from "@/lib/hooks/useCart";
+import { useImageReveal } from "@/lib/hooks/useImageReveal";
 
 interface SpecialCardProps {
   special: SpecialOffer;
 }
 
 export function SpecialCard({ special }: SpecialCardProps) {
-  const Icon = CATEGORY_ICON[special.category];
+  const { addItem } = useCart();
+  const imageRevealRef = useImageReveal<HTMLDivElement>();
 
   return (
     <motion.article
@@ -22,13 +25,15 @@ export function SpecialCard({ special }: SpecialCardProps) {
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-primary/20 bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl"
     >
-      <div className="relative flex h-44 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary-dark via-brand-secondary to-brand-secondary">
-        <div className="bg-noise absolute inset-0 opacity-[0.05]" aria-hidden="true" />
-        <Icon
-          className="h-14 w-14 text-white/25 transition-transform duration-500 group-hover:scale-110"
-          strokeWidth={1.25}
-          aria-hidden="true"
+      <div ref={imageRevealRef} className="relative h-44 overflow-hidden">
+        <Image
+          src={CATEGORY_IMAGE[special.category]}
+          alt={special.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" aria-hidden="true" />
 
         <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-brand-accent px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-secondary">
           <Flame className="h-3 w-3" />
@@ -55,8 +60,21 @@ export function SpecialCard({ special }: SpecialCardProps) {
           </span>
         </div>
 
-        <Button asChild variant="default" className="mt-2 w-full">
-          <Link href={`/order?item=${special.id}`}>Order Now</Link>
+        <Button
+          type="button"
+          variant="default"
+          className="mt-2 w-full"
+          onClick={() =>
+            addItem({
+              id: special.id,
+              name: special.name,
+              category: special.category,
+              price: special.discountedPrice,
+              currency: special.currency,
+            })
+          }
+        >
+          Order Now
         </Button>
       </div>
     </motion.article>

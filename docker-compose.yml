@@ -1,0 +1,107 @@
+# Full local stack: mongo + redis + backend + frontend + nginx (TLS-terminating
+# reverse proxy — see nginx/README notes in nginx.conf/docker-entrypoint.sh).
+#
+# Prerequisites (same as running without Docker — see README.md):
+#   cp backend/.env.example backend/.env      # fill in real values
+#   cp frontend/.env.example frontend/.env.local
+#
+# Run:
+#   docker compose up --build
+#   → https://localhost  (self-signed cert — browser will warn, that's expected)
+#
+# For real production: point MONGODB_URI at a managed Atlas cluster instead
+# of the bundled `mongo` service, put a real TLS certificate at
+# nginx/certs/{fullchain,privkey}.pem, and see DEPLOYMENT.md.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # Override just the connection targets to use Docker's internal
+      # service DNS — everything else (secrets, API keys, SMTP, etc.)
+      # comes from backend/.env above.
+      MONGODB_URI: mongodb://mongo:27017/mrsk_eatries
+      REDIS_URL: redis://redis:6379
+      CLIENT_URL: https://localhost
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Not published to the host on purpose — only nginx talks to it
+    # directly; publish "5000:5000" temporarily if you need to hit the API
+    # without going through the proxy while debugging.
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Baked into the client bundle at build time — this is what the
+        # browser calls, so it must be the externally-reachable URL
+        # (through nginx), not the internal Docker service name.
+        NEXT_PUBLIC_API_BASE_URL: https://localhost/api/v1
+        NEXT_PUBLIC_SOCKET_URL: https://localhost
+        NEXT_PUBLIC_APP_URL: https://localhost
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      # Runtime-only (not baked into the client bundle) — Server Component
+      # fetches use this to hit the backend directly over the Docker
+      # network instead of round-tripping back out through nginx.
+      API_INTERNAL_BASE_URL: http://backend:5000/api/v1
+    depends_on:
+      backend:
+        condition: service_healthy
+    # Not published to the host on purpose — same reasoning as backend
+    # above; everything goes through nginx.
+
+  nginx:
+    build:
+      context: ./nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - nginx_certs:/etc/nginx/certs
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
+  redis_data:
+  nginx_certs:

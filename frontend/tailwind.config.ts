@@ -85,8 +85,13 @@ const config: Config = {
       },
       backgroundImage: {
         "grain": "url('/images/texture-grain.png')",
+        // Tuned down from 0.85 max: that was set against the original
+        // designed-gradient fallback (already dark end-to-end), and
+        // crushed real bright photography to near-black once real
+        // images were wired in (Media System pass) — caught live in a
+        // browser, not from code review.
         "hero-gradient":
-          "linear-gradient(180deg, rgba(17,17,17,0) 0%, rgba(17,17,17,0.85) 100%)",
+          "linear-gradient(180deg, rgba(17,17,17,0) 0%, rgba(17,17,17,0.6) 100%)",
       },
       boxShadow: {
         glass: "0 8px 32px 0 rgba(0, 0, 0, 0.24)",

@@ -4,12 +4,16 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useScroll, useMotionValueEvent } from "framer-motion";
-import { ChevronDown, Heart, Menu as MenuIcon, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, Heart, Menu as MenuIcon, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { MAIN_NAV } from "@/config/site";
+import { useCart } from "@/lib/hooks/useCart";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { MiniCartBadge } from "@/components/cart/MiniCartBadge";
+import { UserDropdown } from "@/components/auth/UserDropdown";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -17,6 +21,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
+  const { itemCount, openDrawer } = useCart();
+  const { isAuthenticated, isLoadingSession } = useAuth();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 24);
@@ -49,18 +55,21 @@ export function Navbar() {
           className="section-container flex items-center justify-between"
         >
           {/* Wordmark */}
-          <Link
-            href="/"
-            className="group flex flex-col leading-none"
-            aria-label="MR_SK EATRIES — Home"
-          >
+          <Link href="/" className="group flex flex-col leading-none">
             <span
               className={cn(
                 "font-display text-xl font-bold tracking-tight transition-colors sm:text-2xl",
                 transparentAtTop ? "text-white" : "text-foreground"
               )}
             >
-              MR_SK <span className="text-brand-accent">EATRIES</span>
+              MR_SK{" "}
+              <span
+                className={
+                  transparentAtTop ? "text-brand-accent" : "text-brand-primary dark:text-brand-accent"
+                }
+              >
+                EATRIES
+              </span>
             </span>
             <span
               className={cn(
@@ -140,8 +149,8 @@ export function Navbar() {
             />
 
             <Link
-              href="/wishlist"
-              aria-label="Wishlist"
+              href="/account/favorites"
+              aria-label="Favorites"
               className={cn(
                 "hidden h-9 w-9 items-center justify-center rounded-full transition-colors sm:flex",
                 transparentAtTop
@@ -152,9 +161,10 @@ export function Navbar() {
               <Heart className="h-[18px] w-[18px]" />
             </Link>
 
-            <Link
-              href="/cart"
-              aria-label="Cart, 0 items"
+            <button
+              type="button"
+              onClick={openDrawer}
+              aria-label={`Open cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}
               className={cn(
                 "relative flex h-9 w-9 items-center justify-center rounded-full transition-colors",
                 transparentAtTop
@@ -163,21 +173,39 @@ export function Navbar() {
               )}
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
-              {/* Cart item count — wired to the Zustand cart store in Sprint 7 */}
-            </Link>
+              <MiniCartBadge />
+            </button>
 
-            <Link
-              href="/auth/login"
-              aria-label="Account"
-              className={cn(
-                "hidden h-9 w-9 items-center justify-center rounded-full transition-colors sm:flex",
-                transparentAtTop
-                  ? "text-white hover:bg-white/10"
-                  : "text-foreground hover:bg-black/5 dark:hover:bg-white/10"
-              )}
-            >
-              <User className="h-[18px] w-[18px]" />
-            </Link>
+            {isLoadingSession ? (
+              <div className="hidden h-9 w-9 sm:block" aria-hidden="true" />
+            ) : isAuthenticated ? (
+              <UserDropdown />
+            ) : (
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link
+                  href="/auth/login"
+                  className={cn(
+                    "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                    transparentAtTop
+                      ? "text-white/90 hover:text-white"
+                      : "text-foreground/80 hover:text-foreground"
+                  )}
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className={cn(
+                    "rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                    transparentAtTop
+                      ? "text-white/90 hover:text-white"
+                      : "text-foreground/80 hover:text-foreground"
+                  )}
+                >
+                  Register
+                </Link>
+              </div>
+            )}
 
             <Button asChild size="sm" variant="accent" className="ml-1 hidden md:inline-flex">
               <Link href="/order">Order Online</Link>

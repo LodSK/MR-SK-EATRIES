@@ -1,0 +1,30 @@
+# Build context is the repo root for both backend/Dockerfile and
+# frontend/Dockerfile — this keeps node_modules, build output, and secrets
+# out of what actually gets sent to the Docker daemon.
+
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/coverage/
+
+.env
+.env.*
+!*.env.example
+
+logs/
+**/*.log
+
+.git/
+.github/
+.vscode/
+.idea/
+
+*.md
+!README.md
+
+.DS_Store
+Thumbs.db
+**/*.tsbuildinfo
+next-env.d.ts

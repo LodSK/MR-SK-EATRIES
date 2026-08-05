@@ -85,13 +85,18 @@ export function Testimonials() {
                 aria-selected={index === selectedIndex}
                 aria-label={`Show testimonial from ${testimonial.name}`}
                 onClick={() => scrollTo(index)}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  index === selectedIndex
-                    ? "w-6 bg-brand-primary dark:bg-brand-accent"
-                    : "w-2 bg-border hover:bg-muted-foreground/40"
-                )}
-              />
+                className="flex h-6 w-6 shrink-0 items-center justify-center"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    index === selectedIndex
+                      ? "w-6 bg-brand-primary dark:bg-brand-accent"
+                      : "w-2 bg-border hover:bg-muted-foreground/40"
+                  )}
+                />
+              </button>
             ))}
           </div>
 

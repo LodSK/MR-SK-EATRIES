@@ -4,8 +4,14 @@ import "./globals.css";
 import { fontVariables } from "@/config/fonts";
 import { SITE_CONFIG } from "@/config/site";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CartProvider } from "@/components/cart/CartProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ChatWidgetLoader } from "@/components/ai/ChatWidgetLoader";
+import { SmoothScrollProvider } from "@/components/shared/SmoothScrollProvider";
+import { PageTransition } from "@/components/shared/PageTransition";
+import { RestaurantSchema } from "@/components/shared/RestaurantSchema";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
@@ -32,7 +38,11 @@ export const metadata: Metadata = {
     images: [SITE_CONFIG.ogImage],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
     apple: "/icons/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
@@ -55,11 +65,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontVariables} font-body`}>
+        <RestaurantSchema />
         <ThemeProvider>
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
-          <Toaster richColors position="top-center" theme="system" />
+          <AuthProvider>
+            <CartProvider>
+              <SmoothScrollProvider>
+                <Navbar />
+                <main id="main-content">
+                  <PageTransition>{children}</PageTransition>
+                </main>
+                <Footer />
+                <Toaster richColors position="top-center" theme="system" />
+                <ChatWidgetLoader />
+              </SmoothScrollProvider>
+            </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

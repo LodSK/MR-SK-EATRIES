@@ -1,0 +1,66 @@
+import { httpClient, getApiErrorMessage } from "@/lib/api/httpClient";
+import type { Order } from "@/types/order";
+
+function normalizeOrder(raw: Order & { _id?: string }): Order {
+  return { ...raw, id: raw.id ?? raw._id ?? "" };
+}
+
+export async function getOrderHistory(page = 1, limit = 20): Promise<Order[]> {
+  const { data } = await httpClient.get("/orders/history", { params: { page, limit } });
+  return (data.data as Order[]).map(normalizeOrder);
+}
+
+export async function getOrderById(id: string): Promise<Order | null> {
+  try {
+    const { data } = await httpClient.get(`/orders/${id}`);
+    return normalizeOrder(data.data);
+  } catch {
+    return null;
+  }
+}
+
+export function getOrderErrorMessage(error: unknown): string {
+  return getApiErrorMessage(error, "We couldn't load this order.");
+}
+
+/** Guest order tracking by human-friendly order number + email — see the backend's getOrderByNumber. */
+export async function trackOrder(
+  orderNumber: string,
+  email: string
+): Promise<{ success: boolean; message: string; order?: Order }> {
+  try {
+    const { data } = await httpClient.get(`/orders/track/${encodeURIComponent(orderNumber)}`, {
+      params: { email },
+    });
+    return { success: true, message: data.message, order: normalizeOrder(data.data) };
+  } catch (error) {
+    return {
+      success: false,
+      message: getApiErrorMessage(error, "We couldn't find an order matching those details."),
+    };
+  }
+}
+
+// ── Admin ──────────────────────────────────────────────────────────
+
+export async function adminListOrders(params: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+}): Promise<{ orders: Order[]; total: number }> {
+  const { data } = await httpClient.get("/admin/orders", { params });
+  return { orders: (data.data as Order[]).map(normalizeOrder), total: data.meta?.total ?? data.data.length };
+}
+
+export async function adminUpdateOrderStatus(
+  id: string,
+  status: Order["status"]
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { data } = await httpClient.patch(`/admin/orders/${id}/status`, { status });
+    return { success: true, message: data.message };
+  } catch (error) {
+    return { success: false, message: getApiErrorMessage(error) };
+  }
+}

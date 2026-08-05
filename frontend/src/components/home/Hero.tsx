@@ -4,9 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown, MapPin, UtensilsCrossed } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { fadeUp, staggerContainer } from "@/lib/animations/variants";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+
+const HEADLINE_WORDS = ["Where", "Every", "Plate"];
+const HEADLINE_WORDS_LINE_2 = ["Tells", "a"];
 
 interface HeroProps {
   /** Optional real photography — falls back to a designed gradient scene until assets are supplied. */
@@ -17,11 +22,37 @@ interface HeroProps {
 
 export function Hero({ imageSrc, videoSrc }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
+
+  // GSAP Phase — animated typography: each headline word flies in on its
+  // own stagger, independent of (and layered under) the Framer-driven
+  // fade/rise the rest of the hero content already uses.
+  useEffect(() => {
+    if (prefersReducedMotion || !headlineRef.current) return;
+    const words = headlineRef.current.querySelectorAll<HTMLElement>(".hero-word");
+    const tween = gsap.fromTo(
+      words,
+      { opacity: 0, y: "110%", rotateX: -40 },
+      {
+        opacity: 1,
+        y: "0%",
+        rotateX: 0,
+        duration: 0.9,
+        stagger: 0.06,
+        delay: 0.15,
+        ease: "power4.out",
+      }
+    );
+    return () => {
+      tween.kill();
+    };
+  }, [prefersReducedMotion]);
 
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
@@ -32,8 +63,15 @@ export function Hero({ imageSrc, videoSrc }: HeroProps) {
       ref={sectionRef}
       className="relative flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden bg-brand-secondary"
     >
-      {/* Background layer */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 -z-10 scale-110">
+      {/* Background layer — no negative z-index: the section's own bg-brand-secondary
+          paints in front of negative-z-index children in this stacking context, so
+          layering is done via DOM order (background, then overlays, then content)
+          instead. Caught live in a browser: a real photo here rendered as solid
+          black until this was fixed — negative z-index had silently hidden every
+          hero background image/gradient blob sitewide the whole project, unnoticed
+          because the fallback gradient's absence looked enough like the intended
+          dark scene to not be obviously broken. */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110">
         {videoSrc ? (
           <video
             className="h-full w-full object-cover"
@@ -70,9 +108,13 @@ export function Hero({ imageSrc, videoSrc }: HeroProps) {
         )}
       </motion.div>
 
-      {/* Legibility overlay */}
-      <div className="absolute inset-0 -z-[5] bg-hero-gradient" aria-hidden="true" />
-      <div className="absolute inset-0 -z-[5] bg-black/35" aria-hidden="true" />
+      {/* Legibility overlay — the gradient alone (tuned in tailwind.config.ts)
+          already carries bottom-weighted legibility; this flat layer is
+          just a light, uniform assist for the center-positioned content,
+          not a second heavy darken pass (see the hero-gradient comment
+          for why that combination crushed real photography to black). */}
+      <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/15" aria-hidden="true" />
 
       {/* Content */}
       <motion.div
@@ -90,14 +132,27 @@ export function Hero({ imageSrc, videoSrc }: HeroProps) {
           Now Open — Reservations Available Daily
         </motion.span>
 
-        <motion.h1
-          variants={fadeUp}
+        <h1
+          ref={headlineRef}
+          style={{ perspective: 800 }}
           className="text-balance font-display text-5xl font-bold leading-[1.05] text-white sm:text-6xl lg:text-7xl"
         >
-          Where Every Plate
-          <br />
-          Tells a <span className="text-brand-accent">Story</span>
-        </motion.h1>
+          <span className="block overflow-hidden">
+            {HEADLINE_WORDS.map((word) => (
+              <span key={word} className="hero-word mr-3 inline-block last:mr-0">
+                {word}
+              </span>
+            ))}
+          </span>
+          <span className="block overflow-hidden">
+            {HEADLINE_WORDS_LINE_2.map((word) => (
+              <span key={word} className="hero-word mr-3 inline-block last:mr-0">
+                {word}
+              </span>
+            ))}
+            <span className="hero-word inline-block text-brand-accent">Story</span>
+          </span>
+        </h1>
 
         <motion.p
           variants={fadeUp}

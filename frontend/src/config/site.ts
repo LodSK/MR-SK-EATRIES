@@ -28,6 +28,20 @@ export const SITE_CONFIG = {
   ],
 } as const;
 
+/**
+ * Structured (schema.org) equivalent of `SITE_CONFIG.hours` above, for
+ * Restaurant JSON-LD `openingHoursSpecification`. Kept as a hand-written
+ * sibling rather than parsed from the display strings — the display text
+ * ("Monday — Thursday") isn't a reliable machine format, and there are
+ * only 3 rows, so parsing it would add fragility for no real benefit.
+ * If the hours ever change, update both.
+ */
+export const STRUCTURED_HOURS: { dayOfWeek: string[]; opens: string; closes: string }[] = [
+  { dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"], opens: "08:00", closes: "22:00" },
+  { dayOfWeek: ["Friday", "Saturday"], opens: "08:00", closes: "23:59" },
+  { dayOfWeek: ["Sunday"], opens: "09:00", closes: "21:00" },
+];
+
 export const SOCIAL_LINKS: SocialLink[] = [
   { label: "Instagram", href: "https://instagram.com/mrsk.eatries", icon: "instagram" },
   { label: "Facebook", href: "https://facebook.com/mrsk.eatries", icon: "facebook" },
@@ -73,7 +87,7 @@ export const FOOTER_LINKS: { title: string; items: NavItem[] }[] = [
       { label: "Order Online", href: "/order" },
       { label: "Reservations", href: "/reservations" },
       { label: "Track Order", href: "/track-order" },
-      { label: "Our Branches", href: "/about#branches" },
+      { label: "Our Branches", href: "/about" },
     ],
   },
   {

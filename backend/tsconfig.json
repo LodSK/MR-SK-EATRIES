@@ -1,23 +1,45 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/config/*": ["src/config/*"],
-      "@/models/*": ["src/models/*"],
-      "@/controllers/*": ["src/controllers/*"],
-      "@/routes/*": ["src/routes/*"],
-      "@/middleware/*": ["src/middleware/*"],
-      "@/services/*": ["src/services/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/validators/*": ["src/validators/*"],
-      "@/types/*": ["src/types/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@/config/*": [
+        "src/config/*"
+      ],
+      "@/models/*": [
+        "src/models/*"
+      ],
+      "@/controllers/*": [
+        "src/controllers/*"
+      ],
+      "@/routes/*": [
+        "src/routes/*"
+      ],
+      "@/middleware/*": [
+        "src/middleware/*"
+      ],
+      "@/services/*": [
+        "src/services/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/validators/*": [
+        "src/validators/*"
+      ],
+      "@/types/*": [
+        "src/types/*"
+      ]
     },
     "strict": true,
     "noImplicitAny": true,
@@ -36,6 +58,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests"
+  ]
 }

@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { InstagramGallery } from "@/components/home/InstagramGallery";
 import { FAQ } from "@/components/home/FAQ";
 import { Newsletter } from "@/components/home/Newsletter";
+import { HERO_IMAGE } from "@/lib/constants/media";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <Hero />
+      <Hero imageSrc={HERO_IMAGE} />
       <TodaysSpecials />
       <FeaturedMeals />
       <Categories />

@@ -1,0 +1,44 @@
+import { Router } from "express";
+import authRoutes from "@/routes/auth.routes";
+import menuRoutes from "@/routes/menu.routes";
+import cartRoutes from "@/routes/cart.routes";
+import orderRoutes from "@/routes/order.routes";
+import couponRoutes from "@/routes/coupon.routes";
+import reservationRoutes from "@/routes/reservation.routes";
+import userRoutes from "@/routes/user.routes";
+import reviewRoutes from "@/routes/review.routes";
+import wishlistRoutes from "@/routes/wishlist.routes";
+import notificationRoutes from "@/routes/notification.routes";
+import uploadRoutes from "@/routes/upload.routes";
+import adminRoutes from "@/routes/admin.routes";
+import newsletterRoutes from "@/routes/newsletter.routes";
+import paymentMethodRoutes from "@/routes/payment-method.routes";
+import settingsRoutes from "@/routes/settings.routes";
+import aiRoutes from "@/routes/ai.routes";
+import contactRoutes from "@/routes/contact.routes";
+import blogRoutes from "@/routes/blog.routes";
+import jobApplicationRoutes from "@/routes/job-application.routes";
+
+const router = Router();
+
+router.use("/auth", authRoutes);
+router.use(menuRoutes);
+router.use(cartRoutes);
+router.use(orderRoutes);
+router.use(couponRoutes);
+router.use(reservationRoutes);
+router.use(userRoutes);
+router.use(reviewRoutes);
+router.use(wishlistRoutes);
+router.use(notificationRoutes);
+router.use(uploadRoutes);
+router.use(adminRoutes);
+router.use(newsletterRoutes);
+router.use(paymentMethodRoutes);
+router.use(settingsRoutes);
+router.use(aiRoutes);
+router.use(contactRoutes);
+router.use(blogRoutes);
+router.use(jobApplicationRoutes);
+
+export default router;

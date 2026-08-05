@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // Self-contained server build (only the files actually needed at runtime,
+  // traced dependencies copied in) — Sprint 15's Docker image runs this
+  // instead of the full node_modules tree, dramatically shrinking the
+  // final image.
+  output: "standalone",
 
   images: {
     remotePatterns: [

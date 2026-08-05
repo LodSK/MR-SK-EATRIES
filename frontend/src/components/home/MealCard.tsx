@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { FeaturedMeal } from "@/types/menu";
-import { CATEGORY_ICON } from "@/lib/constants/homepage-data";
+import { CATEGORY_IMAGE } from "@/lib/constants/media";
 import { Rating } from "@/components/shared/Rating";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { fadeUp } from "@/lib/animations/variants";
+import { useCart } from "@/lib/hooks/useCart";
+import { useImageReveal } from "@/lib/hooks/useImageReveal";
 
 interface MealCardProps {
   meal: FeaturedMeal;
@@ -21,7 +24,8 @@ const TAG_STYLES: Record<NonNullable<FeaturedMeal["tag"]>, string> = {
 };
 
 export function MealCard({ meal }: MealCardProps) {
-  const Icon = CATEGORY_ICON[meal.category];
+  const { addItem } = useCart();
+  const imageRevealRef = useImageReveal<HTMLDivElement>();
 
   return (
     <motion.article
@@ -30,14 +34,15 @@ export function MealCard({ meal }: MealCardProps) {
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl"
     >
-      {/* Media — designed placeholder until food photography is added */}
-      <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark">
-        <div className="bg-noise absolute inset-0 opacity-[0.05]" aria-hidden="true" />
-        <Icon
-          className="h-16 w-16 text-white/25 transition-transform duration-500 group-hover:scale-110 group-hover:text-white/35"
-          strokeWidth={1.25}
-          aria-hidden="true"
+      <div ref={imageRevealRef} className="relative h-52 overflow-hidden">
+        <Image
+          src={CATEGORY_IMAGE[meal.category]}
+          alt={meal.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" aria-hidden="true" />
 
         {meal.tag && (
           <span
@@ -49,15 +54,6 @@ export function MealCard({ meal }: MealCardProps) {
             {meal.tag}
           </span>
         )}
-
-        <button
-          type="button"
-          aria-label={`Add ${meal.name} to wishlist`}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors hover:bg-white/25"
-        >
-          {/* Wired to the wishlist store in Sprint 7 */}
-          <Heart className="h-4 w-4" />
-        </button>
       </div>
 
       {/* Content */}
@@ -81,14 +77,26 @@ export function MealCard({ meal }: MealCardProps) {
         </div>
 
         <div className="mt-2 flex items-center gap-2">
-          <Button asChild variant="default" size="sm" className="flex-1">
-            <Link href={`/order?item=${meal.id}`}>
-              <Plus className="h-4 w-4" />
-              Add to Order
-            </Link>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            className="flex-1"
+            onClick={() =>
+              addItem({
+                id: meal.id,
+                name: meal.name,
+                category: meal.category,
+                price: meal.price,
+                currency: meal.currency,
+              })
+            }
+          >
+            <Plus className="h-4 w-4" />
+            Add to Order
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/menu/${meal.category}#${meal.id}`}>View</Link>
+            <Link href={`/menu/${meal.category}`}>View</Link>
           </Button>
         </div>
       </div>

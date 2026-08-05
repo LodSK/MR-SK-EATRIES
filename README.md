@@ -10,9 +10,11 @@ This project is being built sprint by sprint. See `PROJECT_STATUS.md` for exactl
 
 ## Stack
 
-**Frontend:** Next.js 15 (App Router) · React 19 · TypeScript · TailwindCSS · Framer Motion · GSAP · Radix/shadcn-style UI · React Hook Form + Zod · TanStack Query · Zustand · Socket.io client
+**Frontend:** Next.js 15 (App Router) · React 19 · TypeScript · TailwindCSS · Framer Motion · GSAP · Radix/shadcn-style UI · React Hook Form + Zod · Zustand · Socket.io client
 
-**Backend:** Node.js · Express · MongoDB Atlas (Mongoose) · JWT + bcrypt · Redis · Cloudinary · Socket.io · Helmet/rate-limiting/hardening middleware
+**Backend:** Node.js · Express · MongoDB (Mongoose) · JWT + bcrypt · Redis · Cloudinary · Socket.io · Helmet/rate-limiting/hardening middleware · winston (structured logging)
+
+**Infra:** Docker (multi-stage builds, standalone Next.js output) · Docker Compose (mongo, redis, backend, frontend, nginx) · nginx (TLS-terminating reverse proxy)
 
 Full rationale for each choice is in `ARCHITECTURE.md`.
 
@@ -25,12 +27,13 @@ MR-SK-EATRIES/
 ├── frontend/            Next.js 15 app
 │   ├── src/
 │   │   ├── app/          routes (App Router)
-│   │   ├── components/   layout, shared, ui, home, menu, reservations, dashboard, admin, chatbot...
+│   │   ├── components/   layout, shared, ui, home, menu, reservations, dashboard, admin, ai...
 │   │   ├── lib/           api, hooks, store, utils, validations, animations
 │   │   ├── config/        site config, fonts
 │   │   ├── types/         shared TS types
 │   │   └── styles/
 │   ├── public/
+│   ├── Dockerfile
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── next.config.ts
@@ -41,13 +44,20 @@ MR-SK-EATRIES/
 ├── backend/              Express API
 │   ├── src/
 │   │   ├── config/ · models/ · controllers/ · routes/ · middleware/
-│   │   ├── services/ · utils/ · validators/ · sockets/ · jobs/
-│   ├── tests/
+│   │   ├── services/ · utils/ · validators/
+│   ├── Dockerfile
 │   ├── package.json
 │   └── tsconfig.json
 │
+├── nginx/                Reverse proxy (TLS termination, gzip, routing)
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── docker-entrypoint.sh
+│
+├── docker-compose.yml
 ├── ARCHITECTURE.md
 ├── PROJECT_STATUS.md
+├── DEPLOYMENT.md
 ├── CLAUDE_RULES.md
 └── README.md
 ```
@@ -56,36 +66,39 @@ MR-SK-EATRIES/
 
 ## Getting Started
 
-### Prerequisites
+### Option A — Docker Compose (full stack, closest to production)
+
+**Prerequisites:** Docker + Docker Compose.
+
+```bash
+cp backend/.env.example backend/.env        # fill in real values
+cp frontend/.env.example frontend/.env.local
+docker compose up --build
+```
+
+Open **`https://localhost`**. The browser will warn about the certificate — that's expected, it's a self-signed cert generated automatically on first start for local verification (see `DEPLOYMENT.md` for swapping in a real one). This brings up MongoDB, Redis, the backend API, the frontend, and an nginx reverse proxy in front of everything.
+
+### Option B — Local Node (faster iteration while developing)
+
+**Prerequisites:**
 - Node.js ≥ 20
 - npm ≥ 10
-- MongoDB Atlas cluster (or local MongoDB instance)
-- Redis instance (local or hosted)
+- MongoDB (Atlas cluster or local `mongod`)
+- Redis (local or hosted — optional in dev; rate limiting/session revocation fall back gracefully without it, see `ARCHITECTURE.md`)
 
-### 1. Install dependencies (from the project root)
 ```bash
-npm install
-```
-This installs both `frontend` and `backend` workspaces in one pass.
+npm install                                  # both workspaces in one pass
 
-### 2. Configure environment variables
-```bash
 cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
-```
-Fill in real values (MongoDB URI, JWT secrets, Cloudinary, Stripe, SMTP, etc.) — see the comments in each file.
+cp backend/.env.example backend/.env         # fill in real values
 
-### 3. Run in development
-```bash
-npm run dev
-```
-This runs the frontend (`http://localhost:3000`) and backend (`http://localhost:5000`) concurrently. To run just one:
-```bash
-npm run dev:frontend
-npm run dev:backend
+npm run dev                                  # frontend :3000 + backend :5000
 ```
 
-### 4. Build for production
+To run just one side: `npm run dev:frontend` / `npm run dev:backend`.
+
+### Build for production (without Docker)
+
 ```bash
 npm run build
 ```
@@ -94,9 +107,9 @@ npm run build
 
 ## Current Status
 
-The backend Express server, database models, and business logic have **not** been implemented yet — Sprint 9 covers this. Until then, `npm run dev:backend` will start an empty workspace with no server entrypoint. The frontend is fully runnable today (Sprints 1–2 complete): layout, theme, navigation, and footer render against a placeholder homepage.
+Sprints 1–15 are complete: full public site, full auth (register/login/sessions/roles/per-device and all-device logout), a production Express + MongoDB backend, the Reservation System, Customer Dashboard, Admin Dashboard, an AI chatbot (Claude/Gemini/Groq, swappable via env var), a Performance/SEO/Accessibility pass (Lighthouse-verified), and this sprint's production hardening — structured logging, Redis-backed rate limiting and session revocation, Docker/Docker Compose/nginx, and a security review.
 
-See `PROJECT_STATUS.md` for the authoritative, up-to-date sprint checklist.
+See `PROJECT_STATUS.md` for the authoritative, sprint-by-sprint breakdown of exactly what exists, what's a disclosed placeholder, and what technical debt remains — and `DEPLOYMENT.md` for what a real production deployment still needs (a real domain + TLS certificate, real third-party API keys, a managed MongoDB/Redis instance).
 
 ---
 
