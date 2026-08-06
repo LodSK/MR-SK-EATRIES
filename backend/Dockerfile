@@ -30,6 +30,14 @@ COPY --from=production-deps --chown=nodejs:nodejs /app/node_modules ./node_modul
 COPY --from=builder --chown=nodejs:nodejs /app/backend/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/backend/package.json ./package.json
 
+# config/logger.ts's winston-daily-rotate-file transports create ./logs on
+# first write. /app itself is root-owned (only the COPY targets above were
+# chowned individually), so the nodejs user couldn't create that directory
+# without this — surfaced as a hard EACCES crash on every production boot,
+# never caught before because nothing had actually run this image end-to-
+# end until a real deploy did.
+RUN mkdir logs && chown nodejs:nodejs logs
+
 USER nodejs
 ENV NODE_ENV=production
 EXPOSE 5000
