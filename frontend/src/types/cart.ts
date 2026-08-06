@@ -57,4 +57,7 @@ export interface SubmitOrderResult {
   orderId: string;
   message: string;
   estimatedDeliveryMinutes: [number, number];
+  /** Set only for "card" orders — the Paystack hosted checkout URL the
+   * browser must be redirected to next; the order isn't confirmed yet. */
+  requiresRedirect?: string;
 }

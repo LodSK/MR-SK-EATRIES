@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils/cn";
 import { MAIN_NAV } from "@/config/site";
 import { useCart } from "@/lib/hooks/useCart";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { gsap } from "@/lib/animations/gsap";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { MobileMenu } from "@/components/layout/MobileMenu";
@@ -23,9 +25,37 @@ export function Navbar() {
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const { itemCount, openDrawer } = useCart();
   const { isAuthenticated, isLoadingSession } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
+
+  const headerRef = React.useRef<HTMLElement | null>(null);
+  const lastScrollY = React.useRef(0);
+  const hiddenRef = React.useRef(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 24);
+
+    // Direction-aware hide/reveal: hide once scrolled well past the
+    // header's own height (so it never disappears while still over the
+    // hero) and only once the user has scrolled a meaningful amount in one
+    // direction, not on every 1px jitter. Framer's `useScroll` already
+    // gives a de-duped, rAF-throttled scroll value — reused here rather
+    // than standing up a second (GSAP ScrollTrigger) scroll listener next
+    // to it; GSAP still does the actual tween/easing below.
+    const delta = latest - lastScrollY.current;
+    const header = headerRef.current;
+    if (header && !prefersReducedMotion) {
+      const shouldHide = latest > 160 && delta > 4;
+      const shouldReveal = delta < -4 || latest <= 160;
+
+      if (shouldHide && !hiddenRef.current) {
+        hiddenRef.current = true;
+        gsap.to(header, { yPercent: -100, duration: 0.35, ease: "power2.inOut" });
+      } else if (shouldReveal && hiddenRef.current) {
+        hiddenRef.current = false;
+        gsap.to(header, { yPercent: 0, duration: 0.35, ease: "power2.inOut" });
+      }
+    }
+    lastScrollY.current = latest;
   });
 
   // Close mobile menu automatically on route change
@@ -44,6 +74,7 @@ export function Navbar() {
       </a>
 
       <header
+        ref={headerRef}
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-all duration-300",
           scrolled ? "glass shadow-glass" : "bg-transparent",

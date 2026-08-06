@@ -1,6 +1,15 @@
 import { Schema, model, type Document, type Types } from "mongoose";
 import { orderItemSchema, type IOrderItem } from "@/models/OrderItem.model";
-import { ORDER_STATUSES, DELIVERY_METHODS, PAYMENT_METHODS, type OrderStatus, type DeliveryMethod, type PaymentMethod } from "@/config/constants";
+import {
+  ORDER_STATUSES,
+  DELIVERY_METHODS,
+  PAYMENT_METHODS,
+  PAYMENT_STATUSES,
+  type OrderStatus,
+  type DeliveryMethod,
+  type PaymentMethod,
+  type PaymentStatus,
+} from "@/config/constants";
 
 export interface IOrder extends Document {
   _id: Types.ObjectId;
@@ -20,6 +29,10 @@ export interface IOrder extends Document {
   couponCode?: string;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  /** Paystack transaction reference — set once initializeOrderPayment runs. */
+  paymentReference?: string;
+  paidAt?: Date;
   status: OrderStatus;
 
   customerName: string;
@@ -52,6 +65,9 @@ const orderSchema = new Schema<IOrder>(
     couponCode: String,
     deliveryMethod: { type: String, enum: DELIVERY_METHODS, required: true },
     paymentMethod: { type: String, enum: PAYMENT_METHODS, required: true },
+    paymentStatus: { type: String, enum: PAYMENT_STATUSES, default: "pending", index: true },
+    paymentReference: { type: String, index: true, sparse: true },
+    paidAt: Date,
     status: { type: String, enum: ORDER_STATUSES, default: "pending", index: true },
 
     customerName: { type: String, required: true },

@@ -41,6 +41,20 @@ export async function trackOrder(
   }
 }
 
+/** Called by the /checkout/verify page after Paystack redirects back —
+ * re-checks the transaction against Paystack directly rather than trusting
+ * the redirect's own query params. */
+export async function verifyPayment(
+  reference: string
+): Promise<{ success: boolean; paid: boolean; message: string; order?: Order }> {
+  try {
+    const { data } = await httpClient.get("/orders/pay/verify", { params: { reference } });
+    return { success: true, paid: data.data.paid, message: data.message, order: normalizeOrder(data.data.order) };
+  } catch (error) {
+    return { success: false, paid: false, message: getApiErrorMessage(error, "We couldn't verify this payment.") };
+  }
+}
+
 // ── Admin ──────────────────────────────────────────────────────────
 
 export async function adminListOrders(params: {

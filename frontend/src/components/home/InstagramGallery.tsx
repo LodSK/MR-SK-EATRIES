@@ -1,17 +1,50 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Instagram } from "lucide-react";
 import { SOCIAL_POSTS } from "@/lib/constants/social-gallery-data";
 import { CATEGORY_ICON } from "@/lib/constants/homepage-data";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/config/site";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import { staggerContainer, fadeUp } from "@/lib/animations/variants";
 import { cn } from "@/lib/utils/cn";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 const instagramProfile = SOCIAL_LINKS.find((s) => s.icon === "instagram")?.href ?? "#";
 
 export function InstagramGallery() {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Sprint 17 — staggered scale-in reveal, giving the gallery a "curated
+  // wall" feel rather than a static grid.
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el || prefersReducedMotion) return;
+
+    const tiles = Array.from(el.children);
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        tiles,
+        { opacity: 0, scale: 0.7 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          ease: "power2.out",
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
+
   return (
     <section className="section-container py-20 sm:py-28" aria-labelledby="social-gallery-heading">
       <SectionHeading
@@ -21,19 +54,15 @@ export function InstagramGallery() {
         className="mx-auto mb-14 max-w-3xl"
       />
 
-      <motion.div
-        variants={staggerContainer(0.06)}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
+      <div
+        ref={gridRef}
         className="grid auto-rows-[140px] grid-cols-2 gap-3 sm:auto-rows-[160px] sm:gap-4 md:grid-cols-4"
       >
         {SOCIAL_POSTS.map((post) => {
           const Icon = CATEGORY_ICON[post.category];
           return (
-            <motion.a
+            <a
               key={post.id}
-              variants={fadeUp}
               href={instagramProfile}
               target="_blank"
               rel="noopener noreferrer"
@@ -54,10 +83,10 @@ export function InstagramGallery() {
                 <Instagram className="h-6 w-6 text-white" />
                 <p className="text-xs font-medium text-white/90">{post.caption}</p>
               </div>
-            </motion.a>
+            </a>
           );
         })}
-      </motion.div>
+      </div>
 
       <p className="mt-8 text-center text-sm text-muted-foreground">
         <a

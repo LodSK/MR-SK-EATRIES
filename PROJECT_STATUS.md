@@ -1,6 +1,6 @@
 # MR_SK EATRIES — Project Status
 
-_Last updated: Sprint 15 (Docker, Deployment, README, Testing, Production Review) — 2026-08-05_
+_Last updated: Sprint 17 Finalization — 2026-08-06_
 
 This file is the single source of truth for what has actually been built. It is updated at the end of every sprint.
 
@@ -35,6 +35,8 @@ A recovery pass consolidated Sprint 1 (architecture/config) and Sprint 2 (UI/lay
 | 13C | AI Frontend: Admin AI Dashboard, Recommendation Cards, Smart Search UI, Prediction Widgets | ✅ Complete |
 | 14 | Performance, SEO, Accessibility, Lazy Loading, Caching | ✅ Complete |
 | 15 | Docker, Deployment, README, Testing, Production Review | ✅ Complete |
+| 16 | Enterprise Integration Completion: Google OAuth, Paystack, Google Maps, GA/Clarity, real SMTP verification | ✅ Complete |
+| 17 | GSAP Animation Madness: cinematic homepage/menu/about motion, commerce flow polish, nav/transition/loading-state work | ✅ Complete |
 
 ---
 
@@ -642,11 +644,13 @@ All exhaustively live-verified earlier this session against a real provider (Gro
 
 ### Known Blockers (per the charter's blocker protocol: why / impact / next action)
 
-1. **Email delivery is completely non-functional.** *Why:* no SMTP credentials configured anywhere in the live environment. *Impact:* registration/password-reset/order/reservation confirmation emails are silently no-ops — functionally invisible to a real user, though nothing in the app crashes or blocks because of it. *Next action:* obtain real SMTP credentials (e.g. a Mailtrap sandbox for continued dev, or a real provider for production) and set `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASSWORD`/`EMAIL_FROM` in `backend/.env`.
-2. **Image upload is non-functional.** *Why:* Cloudinary credentials are still the literal placeholder strings from `.env.example`. *Impact:* avatar upload and admin menu-item image upload both fail at runtime despite complete code. *Next action:* obtain real Cloudinary credentials and set `CLOUDINARY_CLOUD_NAME`/`CLOUDINARY_API_KEY`/`CLOUDINARY_API_SECRET`.
-3. **Payments are architecturally absent, not just unconfigured.** *Why:* Sprint 11 deliberately scoped Payment Methods as placeholder-only (no Stripe SDK anywhere in `package.json` or `src/`). *Impact:* no real payment can be processed; checkout completes as a demo/mock flow. *Next action:* this is a scope decision for a future sprint, not a credentials gap — needs an explicit go-ahead before any Stripe integration work begins, per the charter's "no feature creep" rule.
+**Resolved in Sprint 16** (all three, superseded — kept here struck through rather than deleted, per "do not hide missing work" applied in reverse: don't hide that something used to be broken):
 
-None of these three block continued engineering work (server boots, every other feature runs correctly around them) — they are disclosed exactly as the charter's blocker protocol requires, not silently worked around.
+1. ~~Email delivery is completely non-functional.~~ **Resolved.** Real Gmail SMTP credentials now exist in `backend/.env`. Live-verified this sprint: `nodemailer`'s `transporter.verify()` succeeded and a real test email was sent and accepted by Gmail (`250 2.0.0 OK`). No code changed — `email.service.ts` was already correct; only the credentials were missing before.
+2. ~~Image upload is non-functional.~~ **Resolved as of this sprint's audit** — `backend/.env` was found to already hold real, non-placeholder Cloudinary credentials (`CLOUDINARY_CLOUD_NAME`/`API_KEY`/`API_SECRET`). Not independently re-verified with a live upload this pass (out of scope for Sprint 16, which focused on Google OAuth/Paystack/Maps/Analytics), but the credential itself is real, not a placeholder.
+3. ~~Payments are architecturally absent.~~ **Resolved — but via Paystack, not Stripe**, per the current engineering charter's permanent-architecture list. See "Sprint 16" below for the full implementation. The `stripe` npm package remains installed and unused (dead dependency, not wired to anything) — left alone rather than removed mid-sprint; flagged under Known Issues.
+
+None of these blocked continued engineering work even before resolution (server boots, every other feature runs correctly around them) — they were disclosed exactly as the charter's blocker protocol requires, not silently worked around.
 
 ### Known Defect Requiring a Decision (not a blocker, but flagged per "do not hide missing work")
 
@@ -958,9 +962,106 @@ This is a genuine, live risk, not a process nitpick: nothing from Sprint 5 onwar
 
 ---
 
+## Sprint 16 — Enterprise Integration Completion
+
+Scope per the current engineering charter (`docs/02_MASTER_PROMPT_V2.md`): wire Google OAuth, Cloudinary, Paystack, Google Maps, Google Analytics, and Microsoft Clarity into the frontend, with real verification, not just "configured" status.
+
+**Pre-work finding that reshaped the sprint:** the charter assumed these integrations needed external credentials this assistant would have to ask for. Inspecting `backend/.env` directly (not just `.env.example`) found real, non-placeholder values already present for every one of them except the Paystack webhook secret (Paystack doesn't issue a separate one — see below) and Cloudinary (real, present, not independently re-verified this pass). Sprint 16 was therefore almost entirely a *wiring* sprint, not a credentials-blocked one.
+
+### 1. Google OAuth ("Continue with Google")
+
+- **Backend:** `services/googleOAuth.service.ts` (no passport/SDK dependency — plain `fetch` against Google's token/userinfo REST endpoints, matching this codebase's existing preference for a few HTTP calls over a dependency). `GET /auth/google` redirects to Google's consent screen with a random CSRF `state` held in a short-lived httpOnly cookie; `GET /auth/google/callback` exchanges the code, finds-or-creates the user (`auth.service.ts`'s `findOrCreateGoogleUser`), sets the same refresh cookie `login()` sets, and redirects to a frontend page — no token is ever put in a URL.
+- **User model:** `password` is now conditionally required (`required: function(){ return !this.googleId }`); a new `googleId` field (unique, sparse) links Google accounts. Existing local accounts get linked automatically on first Google sign-in **only** when Google reports the email verified — an unverified email can't be trusted to prove ownership.
+- **Frontend:** `GoogleAuthButton.tsx` (plain `<a>`, not a client handler — this must be a real top-level navigation) added to `LoginForm`/`RegisterForm`. New `/auth/callback` page + `GoogleCallbackContent.tsx` hydrate the session by calling the *existing* `POST /auth/refresh` + `GET /auth/me` — no new session-handoff endpoint was needed.
+- **Verified live:** started the real dev server against the real MongoDB Atlas cluster; `GET /api/v1/auth/google` returns a real `302` to `accounts.google.com` with the real `client_id` and correct `redirect_uri`; `GET /api/v1/auth/google/callback` with a missing/mismatched `state` correctly rejects and redirects to `/auth/login?error=google_auth_failed`.
+- **Known limitation, disclosed:** the full consent-screen round trip (an actual human approving access in a real Google account) was not exercised — that requires an interactive browser session this assistant doesn't have. The two endpoints either side of that human step are live-verified; the middle step (Google's own consent screen) is not. Also unverified from here: whether `http://localhost:5000/api/v1/auth/google/callback` is actually registered as an authorized redirect URI in the Google Cloud Console project the credentials belong to — if it isn't, Google will reject the callback with its own error page, and only the account owner can check/fix that.
+
+### 2. Paystack payments
+
+- **Backend:** `services/paystack.service.ts` (again, plain `fetch`, no SDK) wraps `initializeTransaction`, `verifyTransaction`, and `verifyWebhookSignature`. `Order` gained `paymentStatus` (`pending`/`paid`/`failed`/`refunded`), `paymentReference`, `paidAt` — additive fields; the existing `status` (fulfillment workflow) field is untouched. `POST /orders/:id/pay/initialize` starts a transaction (reuses the exact `assertCanAccess` guest-email-scoping pattern already used for order lookups); `GET /orders/pay/verify?reference=` re-checks the transaction against Paystack directly (never trusts the client's redirect query params) and cross-checks the paid amount against the order's own `grandTotal` before marking anything paid — same anti-tampering posture `createOrder` already applies to pricing.
+- **Order creation behavior change (disclosed):** "card" orders now start `paymentStatus: "pending"` and their confirmation email is deferred until payment verifies (previously, an order's email sent immediately regardless of payment method, since no online payment existed to wait for). "cash"/"mobile-money" orders are unchanged — created `paymentStatus: "paid"` immediately, email sent immediately, exactly as before. Stock is still decremented at order creation for all methods (reserves inventory during checkout — unchanged).
+- **Webhook:** `POST /payments/paystack/webhook`, mounted before body-parser would otherwise discard the raw bytes — `app.ts`'s `express.json()` gained a `verify` hook that stashes `req.rawBody` specifically so the HMAC-SHA512 signature check has the exact bytes Paystack signed, not a re-serialized (and potentially byte-different) `JSON.stringify(req.body)`. **Correction to the charter's assumption:** Paystack signs webhooks with the integration's own secret key, not a separate "webhook secret" — `PAYSTACK_WEBHOOK_SECRET` being empty in `.env` does not block this; `verifyWebhookSignature` uses `PAYSTACK_SECRET_KEY` directly, per Paystack's actual documented behavior.
+- **Frontend:** `CheckoutForm.tsx` now redirects the browser to Paystack's hosted checkout for "card" orders instead of showing the confirmation screen immediately; the cart is deliberately **not** cleared until payment is confirmed (an abandoned Paystack checkout leaves the cart intact rather than silently emptied for an order that was never paid for). New `/checkout/verify` page (`CheckoutVerifyContent.tsx`) is where Paystack's `callback_url` lands; it re-verifies server-side and only then clears the cart and shows success.
+- **Verified live, against Paystack's real sandbox API:** created a real test order via the running backend + real MongoDB, called the real `initialize` endpoint and got back a genuine `https://checkout.paystack.com/...` authorization URL from Paystack's servers, then called `verify` on that (unpaid) reference and confirmed it correctly resolved to `paid: false` / `paymentStatus: "failed"`. Test order and its stock-decrement side effect were cleaned up afterward — no test data left in the real database.
+- **Known limitation, disclosed:** the "money actually changes hands" leg (submitting real card details on Paystack's hosted page) was not exercised — same class of limitation as Google's consent screen: it requires an interactive browser session. The webhook path is code-complete and its signature verification logic is correct per Paystack's documented HMAC scheme, but was not live-fired — that requires a publicly reachable callback URL (e.g. ngrok or a real deployment), which this environment doesn't have.
+
+### 3. Google Maps, Analytics, Clarity
+
+- **Maps:** `LocationMap.tsx` on `/contact` uses the Maps **Embed** API (a signed iframe URL, no JS SDK/loader, renders server-side) — falls back to a plain address card when no key is configured, so environments without a key never render a broken embed.
+- **Analytics/Clarity:** `AnalyticsScripts.tsx` in the root layout, env-gated on `NEXT_PUBLIC_GA_MEASUREMENT_ID`/`NEXT_PUBLIC_CLARITY_PROJECT_ID` — renders nothing at all (not even a script tag) when either is unset.
+- **Config correction, disclosed:** the real Maps/GA/Clarity values existed only in `backend/.env` (under `NEXT_PUBLIC_*`-prefixed names, which a backend process never reads — those only take effect in the frontend's own build). A new `frontend/.env.local` (gitignored, not committed) was created with the real values so the frontend can actually use them.
+- **Build regression found and fixed, disclosed:** creating `frontend/.env.local` for the first time initially broke `npm run build` — an `API_INTERNAL_BASE_URL=` line (present, but empty) satisfies `menu.ts`/`blog.ts`'s `??` fallback chain differently than the variable being entirely absent from `process.env`, which is what happened in every prior sprint's environment (no `.env.local` existed at all before this sprint). The fix was to leave that key commented out, restoring the original fallback-to-`NEXT_PUBLIC_API_BASE_URL` behavior. Full `npm run build` re-verified green afterward (110 pages, real static generation, real `generateStaticParams` calls against the dev server's data).
+- **Verified live:** `npx tsc --noEmit` and `next build` both clean on the real frontend workspace; Maps/GA/Clarity render conditionally per the above, not independently screenshot-verified in an actual browser (no browser automation tool was available this pass).
+
+### Verification performed (Sprint 16 summary)
+
+- **Real `tsc --noEmit`**, both workspaces: 0 errors (backend went from a documented 19-error baseline to 0 — appears the `@types/express`/`express` mismatch flagged since Sprint 9 no longer reproduces under this pass's toolchain; not independently root-caused, noted for whoever picks up that Recommended Refactor next).
+- **Real `npm run build`**, both workspaces: succeed.
+- **Real `npm test`**, both workspaces: 36/36 backend, 39/39 frontend, all passing, zero regressions from the `User`/`Order` schema changes.
+- **Real `npm run lint`**, both workspaces: clean.
+- **Live HTTP requests against the real running backend + real MongoDB Atlas** for Google OAuth's redirect/callback-rejection paths and the full Paystack initialize→verify round trip (real Paystack sandbox API, not mocked).
+- **Real SMTP send** via Gmail, confirmed accepted (`250 2.0.0 OK`).
+- Two disclosed gaps needing an actual browser + human interaction to close: Google's consent screen, and submitting a real card on Paystack's hosted checkout page.
+
+### Known Issues introduced or newly confirmed this sprint
+
+- `stripe` npm package remains installed and completely unused (dead dependency) — Paystack is the real, wired payment gateway now; removing `stripe` was out of scope for this pass.
+- Paystack webhook signature verification is implemented correctly per Paystack's documented scheme but has never actually received a live webhook call (no public URL available in this environment to register with Paystack).
+- Cloudinary's real credentials were found already present but not independently re-verified with a live upload this sprint (Sprint 16's scope was Google OAuth/Paystack/Maps/Analytics specifically).
+- `frontend/.env.example` still lists dead, never-implemented vars from an earlier abandoned plan (`NEXTAUTH_URL`/`NEXTAUTH_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`/`STRIPE_SECRET_KEY`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`) — left alone this pass to keep the diff focused; worth a cleanup pass later.
+- The new `docs/00`–`docs/14` numbered documentation set (introduced alongside the current engineering charter) was found to be mostly empty stub files, duplicating this file and `ENGINEERING_REPORT.md` in name only. `docs/03_API_INVENTORY.md` was populated this sprint; the rest remain a follow-up.
+
+## Sprint 17 — GSAP Animation Madness
+
+Scope: turn the frontend into a "premium, cinematic restaurant experience" using GSAP as the primary engine for new work, per an approved animation plan (`docs/11_GSAP_MASTER_PLAN.md`) written and signed off *before* any implementation — full page/section/component/trigger/UX-objective breakdown lives there.
+
+**Pre-work, done before any animation code:** a full audit found this was not a greenfield animation pass — GSAP (11 files: smooth scroll, page transitions, scroll reveals, image reveals, hero flip-in, stat counters, chat widget) and Framer Motion (34 files: hero parallax, section fades, hover lifts, cart drawer, mobile menu) already divided responsibilities cleanly. The architecture decision, made explicit and approved rather than assumed: new work goes in GSAP; working Framer Motion (`AnimatePresence` exit choreography, mobile menu, cart drawer) stays as-is — no wholesale migration, per "don't force one library where the other provides the better engineering solution."
+
+**Two real bugs fixed first, as instructed, before any new animation work:**
+- `useScrollReveal.ts` didn't check `prefers-reduced-motion` (its sibling `useImageReveal.ts` did) — fixed to match.
+- Route-level loading states expanded from 3 routes (root, `/menu`, `/menu/[category]`) to include `/checkout`, `/cart`, `/reservations`, `/blog/[slug]`, `/menu/[category]/[slug]`, plus group-level coverage for `/account/*` and `/admin/*`. `Skeleton.tsx` gained an opt-in GSAP shimmer sweep (default off, so none of the dozens of pre-existing plain-pulse call sites changed appearance); admin's loading states deliberately don't use it, per Tier 4's "functional, not cinematic" scope.
+
+**Built, by tier:**
+- **Tier 1 (full cinematic treatment)** — Homepage: hero steam/smoke drift, distinct stagger treatments per section (horizontal-slide, scale-rotate, scale-in) for visual variety, GSAP hover on meal cards, scroll-scrubbed testimonial parallax, SVG checkmark draw-in on newsletter success. Menu: category grid stagger, GSAP `Flip`-powered smooth re-flow on filter/sort change, meal-detail hero parallax + add-to-cart pulse. About: chef-portrait hover (adapted to the real avatar-sized component, not the plan's assumed full-bleed portrait), and the standout piece — Journey Timeline's connecting line now visually draws itself via `ScrollTrigger scrub` on an SVG `stroke-dashoffset` as the visitor scrolls. Commerce flow: mini-cart bump, animated checkout-form section collapse (delivery address, GSAP height+opacity, fields stay mounted so `react-hook-form` validation is unaffected), a real SVG checkmark/cross draw-in replacing static icons on order confirmation and Paystack payment verification, and a spinner→result crossfade replacing three previously-separate hard-cut states on `/checkout/verify`.
+- **Tier 2 (elegant, not spectacle)** — Navbar gained scroll-direction-aware hide/reveal. `PageTransition.tsx` gained real exit choreography (previously entrance-only — a disclosed gap from the pre-work audit, now closed) via a buffered-state pattern. Auth pages (`AuthLayout` + `VerifyEmailContent`) got a single shared `fadeUp` entrance. `GoogleCallbackContent.tsx` got the same buffered-state crossfade treatment as the Paystack verify page, built independently by a different engineer/pass and converging on the same pattern — a good consistency signal, not a coincidence worth worrying about.
+- **Tier 3 (minimal, fast, professional)** — `/account/*` layout wraps its content area in a single `fadeUp`, keyed on pathname so it re-fires per dashboard page, deliberately not layered with anything heavier.
+- **Tier 4 (admin)** — No cinematic treatment added, as scoped; only the reduced-motion fix and the plain (non-shimmer) loading skeleton apply here.
+
+**Verification performed:**
+- Real `tsc --noEmit`: 0 errors, full workspace, run repeatedly as four parallel implementation passes landed.
+- Real `npm run lint`: clean.
+- Real `npm test`: 39/39 passing, zero regressions.
+- Real `npm run build`: succeeds, 110 pages.
+- **Real browser verification** (not just static checks — this is a visual/motion sprint, and compilation isn't verification of what something looks like): ran the actual dev server and drove it with a real Chrome session. Confirmed the homepage hero, featured meals, category stagger-in, and About page's Journey Timeline all render and animate correctly. One transient concern investigated live — an apparent duplicate-content render and an unexplained navigation to `/about` during a scroll — was chased down with console-error checks, code review of `Navbar.tsx`, and repeated reproduction attempts; settled screenshots were always clean, no console errors ever appeared, and the navigation anomaly didn't reproduce. The user, who was concurrently interacting with the same session, confirmed the navigation was their own action, not a bug. Documented here rather than silently omitted, consistent with this project's disclosure standard.
+
+**Known limitations:**
+- The homepage hero's steam/smoke effect was not `next/dynamic`-lazy-loaded (a deviation from the plan, disclosed by the implementing pass): it's a handful of divs and one GSAP tween, not a heavy asset, so the one existing lazy-load precedent (the chat widget) didn't clearly apply. Worth a second look if it measurably affects hero paint timing.
+- `AwardsRecognition.tsx` and `WhyCustomersLoveUs.tsx` were deliberately left on their existing, working Framer Motion reveals rather than rebuilt in GSAP — functionally equivalent to what the plan asked for, and rebuilding a working animation for no user-facing gain would be pure churn.
+- Full cross-browser/device visual QA (mobile viewport, Safari, reduced-motion toggled on and actually observed, not just code-reviewed) was not performed this pass — the browser verification above was a targeted smoke test of the highest-risk new animations (steam effect, Journey Timeline, category reveals), not exhaustive coverage of every row in the animation plan.
+
+## Sprint 17 Finalization — Disappearing-Page Regression, Root-Caused and Fixed
+
+Sprint 17's own "Verification performed" notes above recorded a one-off, never-reproduced "apparent duplicate-content render and an unexplained navigation to `/about`," provisionally attributed to the user's own concurrent action. A dedicated finalization pass revisited this rather than leaving it as an unresolved footnote. Full detail in `SPRINT_17_FINAL_COMPLETION_REPORT.md`; summary here.
+
+**The regression was real and 100% reproducible**, not a one-off: any client-side navigation (clicking a nav link from an already-loaded page) left the destination page's content permanently invisible — correct title, correct navbar state, correct content fully present and laid out in the DOM, but `opacity: 0` stuck on the page wrapper forever. A hard reload of the same URL rendered fine, isolating the bug to the client-side transition path specifically.
+
+**Root cause, confirmed via live instrumentation:** `PageTransition.tsx`'s entrance-tween effect was keyed on `displayedChildren` state. Next.js's App Router passes `children` into this component as a stable routing-slot reference — the *same object identity* across every navigation, since the actual segment swap happens inside that reference via router context rather than by handing this component a new element tree per route. `setDisplayedChildren(children)` was therefore always a same-reference no-op React silently bails out of: the entrance effect's dependency never changed, so it never re-ran after the very first page load, and the wrapper's opacity was never animated back to `1` after the exit tween set it to `0`.
+
+**Fix:** keyed the entrance effect on `displayedPathname` (a primitive that reliably changes per route) instead of `displayedChildren`. One line changed in `frontend/src/components/shared/PageTransition.tsx`; no other logic touched.
+
+**Verified fixed live:** Home → About, Home → Menu → category → meal detail, and — the critical stress case — five rapid back/forward browser-history navigations fired in immediate succession, all settling to a correct, fully visible final state with no stuck/blank page.
+
+**Also this pass:**
+- Confirmed the About page's Journey Timeline `ScrollTrigger scrub` draw-in animates correctly (not static) via live scroll-through.
+- Removed four genuinely unused Framer Motion variants (`fadeIn`, `scaleIn`, `slideInLeft`, `slideInRight`) from `lib/animations/variants.ts` — confirmed unimported anywhere via grep before removal. The four variants actually in use were left untouched.
+- Confirmed no standalone artifact/demo/playground code exists anywhere in `frontend/src/app` or `frontend/public`.
+- Re-ran `tsc --noEmit` (0 errors), `npm run lint` (clean), `npm test` (39/39 passing), `npm run build` (succeeds, 110 pages) against the fixed tree — all real runs, not restated numbers.
+
+**Not re-verified live this pass:** `/checkout`, `/reservations`, `/account/*`, and `/admin/*` were not individually clicked through post-fix. The fix is structural (a single shared component wrapping every route identically), but exhaustive route-by-route confirmation remains open — see Recommended Refactors.
+
 ## Roadmap Status
 
-All 15 sprints originally scoped in this file's Sprint Checklist are now complete, each verified in this pass by actually running the relevant commands rather than re-stating prior claims (see Sprint 15 above). This document intentionally stops short of naming a release/version milestone for the build as a whole — that is a product decision for whoever is reading this, not something to declare from inside a status file, particularly with the uncommitted-work risk in §5 still open.
+All 17 sprints originally scoped in this file's Sprint Checklist are now complete, each verified in this pass by actually running the relevant commands rather than re-stating prior claims (see Sprint 16 above). This document intentionally stops short of naming a release/version milestone for the build as a whole — that is a product decision for whoever is reading this, not something to declare from inside a status file, particularly with the uncommitted-work risk in §5 still open.
 
 **Recommended next steps, roughly in priority order:**
 
@@ -969,5 +1070,11 @@ All 15 sprints originally scoped in this file's Sprint Checklist are now complet
 3. **Expand the test suite** (§2) — full-HTTP auth flow via `supertest`, reservation capacity/cancellation, coupon validation, cart/order totals.
 4. **Resolve or remove the Socket.IO dead dependency/config** (§1) — either build the real-time feature it implies or delete the unused dependency and nginx block.
 5. Every item already on the standing Recommended Refactors list above (guest-lookup pattern consistency, `@types/express`/`express` version alignment, role-aware `ADMIN_NAV` filtering, real "Logout All Devices", CORS multi-origin support) remains accurate and unaddressed.
-6. Fill in the real external credentials `DEPLOYMENT.md` §2 lists (TLS certificate, domain, managed MongoDB/Redis, Cloudinary, Stripe, SMTP) before any real production traffic — none of this is a code change, all of it is an account/credentials task for whoever owns this deployment.
+6. Fill in the remaining real external credentials `DEPLOYMENT.md` §2 lists (TLS certificate, domain, managed MongoDB/Redis) before any real production traffic — SMTP, Cloudinary, Google OAuth, Paystack, Maps, GA, and Clarity are now real per Sprint 16.
+7. **Close Sprint 16's two disclosed live-verification gaps** — run the actual Google consent screen and an actual Paystack test-card checkout in a real browser, and confirm `http://localhost:5000/api/v1/auth/google/callback` (and its production equivalent) is registered as an authorized redirect URI in the Google Cloud Console project.
+8. Register the Paystack webhook URL once a public deployment URL exists, and fire one real webhook event end-to-end.
+9. Remove the unused `stripe` npm package now that Paystack is the real, wired gateway.
+10. **Full cross-device/browser visual QA for Sprint 17's animation work** — mobile viewport, Safari, and `prefers-reduced-motion` actually toggled on and observed (not just code-reviewed) across every row in `docs/11_GSAP_MASTER_PLAN.md`, not just the targeted smoke test performed this pass.
+11. Revisit whether the hero steam/smoke effect needs `next/dynamic` lazy-loading if it measurably affects hero paint timing (disclosed deviation from the Sprint 17 plan).
+12. **Extend the Sprint 17 Finalization page-transition fix verification to `/checkout`, `/reservations`, `/account/*`, and `/admin/*`** — the fix is structural and applies uniformly, but only Home/About/Menu/category/meal-detail/Cart were clicked through live post-fix.
 

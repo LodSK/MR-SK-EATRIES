@@ -19,7 +19,10 @@ export interface IUser extends Document {
   _id: Types.ObjectId;
   fullName: string;
   email: string;
-  password: string;
+  /** Absent for accounts created via Google OAuth — see googleId. */
+  password?: string;
+  /** Set only for accounts created (or linked) via "Continue with Google"; unique when present. */
+  googleId?: string;
   phone?: string;
   role: Role;
   avatarUrl?: string;
@@ -64,7 +67,17 @@ const userSchema = new Schema<IUser>(
       trim: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"],
     },
-    password: { type: String, required: true, minlength: 8, select: false },
+    password: {
+      type: String,
+      // Only local (email/password) accounts need one — Google-authenticated
+      // accounts never receive a password and log in via OAuth exclusively.
+      required: function (this: IUser) {
+        return !this.googleId;
+      },
+      minlength: 8,
+      select: false,
+    },
+    googleId: { type: String, unique: true, sparse: true, select: false },
     phone: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "customer" },
     avatarUrl: String,

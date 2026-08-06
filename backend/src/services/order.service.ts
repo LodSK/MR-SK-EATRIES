@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { MenuItem } from "@/models/MenuItem.model";
 import { Order, type IOrder } from "@/models/Order.model";
 import { Coupon } from "@/models/Coupon.model";
@@ -7,6 +8,8 @@ import { STAFF_ROLES, type DeliveryMethod, type PaymentMethod, type Role } from 
 import { validateCouponCode } from "@/services/coupon.service";
 import { sendOrderConfirmationEmail } from "@/services/email.service";
 import { getSettings } from "@/services/settings.service";
+import { initializeTransaction, verifyTransaction } from "@/services/paystack.service";
+import { env } from "@/config/env";
 import { logger } from "@/config/logger";
 
 interface RequesterContext {
@@ -117,6 +120,11 @@ export async function createOrder(input: CreateOrderInput) {
     express: [15, 25],
   };
 
+  // "card" orders aren't confirmed until Paystack verifies payment;
+  // cash/mobile-money are collected outside this app and are treated as
+  // paid immediately, exactly as before this field existed.
+  const paymentStatus = input.paymentMethod === "card" ? "pending" : "paid";
+
   const order = await Order.create({
     orderNumber,
     user: input.userId,
@@ -131,6 +139,7 @@ export async function createOrder(input: CreateOrderInput) {
     couponCode: appliedCouponCode,
     deliveryMethod: input.deliveryMethod,
     paymentMethod: input.paymentMethod,
+    paymentStatus,
     customerName: input.customerName,
     customerEmail: input.customerEmail,
     customerPhone: input.customerPhone,
@@ -139,6 +148,9 @@ export async function createOrder(input: CreateOrderInput) {
     estimatedDeliveryMinutes: etaMap[input.deliveryMethod],
   });
 
+  // Stock is reserved at order creation regardless of payment method — this
+  // matches the pre-existing behavior exactly and avoids overselling while
+  // a card order sits on Paystack's checkout page.
   await Promise.all(
     orderItems.map((item) =>
       MenuItem.updateOne({ _id: item.menuItem }, { $inc: { stockQuantity: -item.quantity, popularityScore: 1 } })
@@ -149,11 +161,111 @@ export async function createOrder(input: CreateOrderInput) {
     await Coupon.updateOne({ code: appliedCouponCode }, { $inc: { usedCount: 1 } });
   }
 
+  // Card orders get their confirmation email once payment is actually
+  // verified (see markOrderPaid) — sending it now would confirm an order
+  // that might never get paid for.
+  if (paymentStatus === "paid") {
+    await sendOrderConfirmationEmail(order.customerEmail, order.orderNumber, order.grandTotal, "GHS").catch((err) =>
+      logger.error("[email] order confirmation failed", { error: err instanceof Error ? err.message : err })
+    );
+  }
+
+  return order;
+}
+
+/**
+ * Starts a Paystack transaction for an existing "card" order and returns
+ * the hosted checkout URL to redirect the browser to. Idempotent-ish: a
+ * second call before payment completes just issues a fresh reference
+ * (Paystack references must be unique per attempt; the order keeps only
+ * the latest one).
+ */
+export async function initializeOrderPayment(orderId: string, requester: RequesterContext) {
+  const order = await Order.findById(orderId);
+  if (!order) throw ApiError.notFound("Order not found.");
+  assertCanAccess(order, requester);
+
+  if (order.paymentMethod !== "card") {
+    throw ApiError.badRequest("This order isn't a card payment.");
+  }
+  if (order.paymentStatus === "paid") {
+    throw ApiError.badRequest("This order has already been paid for.");
+  }
+
+  const reference = `MRSK-PAY-${order.orderNumber}-${randomUUID().slice(0, 8)}`;
+  const result = await initializeTransaction({
+    email: order.customerEmail,
+    amountInPesewas: Math.round(order.grandTotal * 100),
+    reference,
+    callbackUrl: `${env.clientUrl}/checkout/verify`,
+    metadata: { orderId: order._id.toString(), orderNumber: order.orderNumber },
+  });
+
+  order.paymentReference = result.reference;
+  await order.save();
+
+  return { authorizationUrl: result.authorizationUrl, reference: result.reference };
+}
+
+/**
+ * Marks an order paid exactly once — both the browser's post-payment
+ * redirect (checkout/verify) and (once deployed) a Paystack webhook can
+ * legitimately call this for the same reference, and only the first
+ * should send the confirmation email / mutate anything.
+ */
+async function markOrderPaidIfUnpaid(order: IOrder): Promise<boolean> {
+  if (order.paymentStatus === "paid") return false;
+
+  order.paymentStatus = "paid";
+  order.paidAt = new Date();
+  await order.save();
+
   await sendOrderConfirmationEmail(order.customerEmail, order.orderNumber, order.grandTotal, "GHS").catch((err) =>
     logger.error("[email] order confirmation failed", { error: err instanceof Error ? err.message : err })
   );
 
-  return order;
+  return true;
+}
+
+/**
+ * Re-fetches the transaction from Paystack directly (never trusts the
+ * client's redirect query params alone) and cross-checks the paid amount
+ * against the order's own grandTotal before marking anything paid — closes
+ * the same class of client-trust gap createOrder's own comment already
+ * calls out for pricing.
+ */
+export async function verifyOrderPayment(reference: string) {
+  const order = await Order.findOne({ paymentReference: reference });
+  if (!order) throw ApiError.notFound("Order not found for this payment reference.");
+
+  const result = await verifyTransaction(reference);
+  const expectedAmount = Math.round(order.grandTotal * 100);
+
+  if (result.status !== "success" || result.amount !== expectedAmount) {
+    if (order.paymentStatus !== "paid") {
+      order.paymentStatus = "failed";
+      await order.save();
+    }
+    return { order, paid: false };
+  }
+
+  await markOrderPaidIfUnpaid(order);
+  return { order, paid: true };
+}
+
+/** Used by the Paystack webhook — same verification path, keyed by the
+ * reference the webhook payload names, but treats "order not found" as a
+ * silent no-op (webhooks can arrive for events unrelated to this app,
+ * e.g. a test ping) rather than surfacing a 404 to Paystack. */
+export async function handlePaystackWebhookEvent(reference: string): Promise<void> {
+  const order = await Order.findOne({ paymentReference: reference });
+  if (!order) return;
+
+  const result = await verifyTransaction(reference);
+  const expectedAmount = Math.round(order.grandTotal * 100);
+  if (result.status === "success" && result.amount === expectedAmount) {
+    await markOrderPaidIfUnpaid(order);
+  }
 }
 
 export async function getOrderById(id: string, requester: RequesterContext) {

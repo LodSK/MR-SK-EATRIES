@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 interface ScrollRevealOptions {
   /** Pixels to translate up from on enter. Default 32. */
@@ -24,10 +25,11 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   options: ScrollRevealOptions = {}
 ) {
   const ref = useRef<T | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || prefersReducedMotion) return;
 
     const targets = el.children.length > 0 ? Array.from(el.children) : [el];
 
@@ -52,7 +54,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
 
     return () => ctx.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [prefersReducedMotion]);
 
   return ref;
 }

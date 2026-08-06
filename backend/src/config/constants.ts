@@ -10,6 +10,14 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number];
 export const PAYMENT_METHODS = ["card", "mobile-money", "cash"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
+/** "card" orders start "pending" and move to "paid"/"failed" once Paystack
+ * confirms the transaction; "cash"/"mobile-money" orders are collected
+ * outside this app (at pickup/delivery) and are never online-verified, so
+ * they're created "paid" — this only changes what's tracked/displayed, not
+ * the order fulfillment workflow (`status`), which stays untouched. */
+export const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"] as const;
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+
 export const DELIVERY_METHODS = ["pickup", "standard", "express"] as const;
 export type DeliveryMethod = (typeof DELIVERY_METHODS)[number];
 

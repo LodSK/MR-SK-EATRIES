@@ -1,11 +1,49 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { fadeUp, staggerContainer } from "@/lib/animations/variants";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+
+const MAGNETIC_STRENGTH = 0.35;
+const MAGNETIC_MAX_OFFSET = 10;
+
+/**
+ * A pointer-tracking effect like this is a continuous imperative
+ * interaction, not an entry/exit/layout transition — GSAP's `quickTo` is
+ * built for exactly this (a reusable, high-perf tween updated every
+ * pointermove) where Framer Motion would need `useMotionValue` wiring for
+ * the same result. Kept local to this one CTA rather than a shared hook —
+ * this is the only magnetic-hover use case in the plan.
+ */
+function useMagneticHover<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  function handleMouseMove(e: React.MouseEvent<T>) {
+    if (prefersReducedMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const relX = e.clientX - (rect.left + rect.width / 2);
+    const relY = e.clientY - (rect.top + rect.height / 2);
+    const x = gsap.utils.clamp(-MAGNETIC_MAX_OFFSET, MAGNETIC_MAX_OFFSET, relX * MAGNETIC_STRENGTH);
+    const y = gsap.utils.clamp(-MAGNETIC_MAX_OFFSET, MAGNETIC_MAX_OFFSET, relY * MAGNETIC_STRENGTH);
+    gsap.to(ref.current, { x, y, duration: 0.3, ease: "power2.out" });
+  }
+
+  function handleMouseLeave() {
+    if (prefersReducedMotion || !ref.current) return;
+    gsap.to(ref.current, { x: 0, y: 0, duration: 0.4, ease: "elastic.out(1, 0.4)" });
+  }
+
+  return { ref, handleMouseMove, handleMouseLeave };
+}
 
 export function AboutCTA() {
+  const magnetic = useMagneticHover<HTMLDivElement>();
+
   return (
     <section className="relative overflow-hidden bg-brand-secondary py-20 sm:py-24">
       <div className="bg-noise absolute inset-0 opacity-[0.04]" aria-hidden="true" />
@@ -32,9 +70,16 @@ export function AboutCTA() {
         </motion.p>
 
         <motion.div variants={fadeUp} className="mt-2 flex flex-col items-center gap-3 sm:flex-row">
-          <Button asChild size="lg" variant="accent">
-            <Link href="/reservations">Reserve a Table</Link>
-          </Button>
+          <div
+            ref={magnetic.ref}
+            onMouseMove={magnetic.handleMouseMove}
+            onMouseLeave={magnetic.handleMouseLeave}
+            className="inline-block"
+          >
+            <Button asChild size="lg" variant="accent">
+              <Link href="/reservations">Reserve a Table</Link>
+            </Button>
+          </div>
           <Button asChild size="lg" variant="default">
             <Link href="/menu">View Menu</Link>
           </Button>

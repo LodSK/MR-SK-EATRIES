@@ -12,6 +12,8 @@ import { DeliverySelector } from "@/components/cart/DeliverySelector";
 import { PaymentSelector } from "@/components/cart/PaymentSelector";
 import { FormMessage } from "@/components/auth/FormMessage";
 import { Button } from "@/components/ui/button";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 interface CheckoutFormProps {
   onSuccess: (result: SubmitOrderResult) => void;
@@ -42,12 +44,21 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
   async function onSubmit(values: CheckoutSchemaValues) {
     setServerError(null);
     const result = await submitOrder(values, items);
-    if (result.success) {
-      clearCart();
-      onSuccess(result);
-    } else {
+    if (!result.success) {
       setServerError(result.message);
+      return;
     }
+
+    if (result.requiresRedirect) {
+      // Cart stays intact until CheckoutVerifyContent confirms payment —
+      // if the customer abandons Paystack's checkout, their cart is still
+      // there rather than silently emptied for an order that never paid.
+      window.location.href = result.requiresRedirect;
+      return;
+    }
+
+    clearCart();
+    onSuccess(result);
   }
 
   return (
@@ -95,7 +106,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
       </section>
 
       {/* Delivery Address */}
-      {!isPickup && (
+      <CollapsibleSection show={!isPickup}>
         <section>
           <h2 className="mb-4 font-display text-lg font-bold">Delivery Address</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -115,7 +126,7 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
             </Field>
           </div>
         </section>
-      )}
+      </CollapsibleSection>
 
       {/* Delivery Instructions */}
       <section>
@@ -150,6 +161,71 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
         )}
       </Button>
     </form>
+  );
+}
+
+interface CollapsibleSectionProps {
+  show: boolean;
+  children: React.ReactNode;
+}
+
+/**
+ * Keeps `children` mounted (so `react-hook-form`'s `register`/validation
+ * for fields inside it — e.g. street/city — behaves identically to before)
+ * and animates height+opacity via GSAP instead of the previous
+ * instant-mount/unmount snap. Skips animating the very first render (the
+ * section simply starts in the right state — pickup vs delivery — rather
+ * than visibly collapsing on load).
+ */
+function CollapsibleSection({ show, children }: CollapsibleSectionProps) {
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
+  const isFirstRender = React.useRef(true);
+  const prefersReducedMotion = useReducedMotion();
+
+  React.useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      gsap.set(el, { height: show ? "auto" : 0, opacity: show ? 1 : 0 });
+      return;
+    }
+
+    if (prefersReducedMotion) {
+      gsap.set(el, { height: show ? "auto" : 0, opacity: show ? 1 : 0 });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      if (show) {
+        gsap.set(el, { height: "auto" });
+        const targetHeight = el.offsetHeight;
+        gsap.fromTo(
+          el,
+          { height: 0, opacity: 0 },
+          {
+            height: targetHeight,
+            opacity: 1,
+            duration: 0.4,
+            ease: "power2.out",
+            onComplete: () => {
+              gsap.set(el, { height: "auto" });
+            },
+          }
+        );
+      } else {
+        gsap.to(el, { height: 0, opacity: 0, duration: 0.3, ease: "power2.in" });
+      }
+    }, el);
+
+    return () => ctx.revert();
+  }, [show, prefersReducedMotion]);
+
+  return (
+    <div ref={wrapperRef} style={{ overflow: "hidden" }}>
+      {children}
+    </div>
   );
 }
 

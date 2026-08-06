@@ -1,14 +1,16 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { backdropFade, menuPanel } from "@/lib/animations/variants";
+import { backdropFade, menuPanel, fadeUp } from "@/lib/animations/variants";
 
 function AccountShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -66,7 +68,13 @@ function AccountShell({ children }: { children: React.ReactNode }) {
         <div className="mb-6 -mt-4 rounded-2xl border border-border bg-card">
           <DashboardHeader onOpenSidebar={() => setMobileOpen(true)} />
         </div>
-        {children}
+        {/* Tier 3 per the Sprint 17 plan: light, consistent entrance only —
+            keyed on pathname so it re-fires switching between dashboard
+            pages, not just on first entry to /account/*. Deliberately just
+            `fadeUp`, not a second animation system layered on top of it. */}
+        <motion.div key={pathname} variants={fadeUp} initial="hidden" animate="visible">
+          {children}
+        </motion.div>
       </div>
     </div>
   );

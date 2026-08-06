@@ -130,6 +130,13 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "ember-drift": {
+          "0%": { transform: "translate(-6px, 0) scale(0.9)", opacity: "0.12" },
+          "25%": { transform: "translate(10px, 26vh) scale(1.05)", opacity: "0.2" },
+          "50%": { transform: "translate(-8px, 52vh) scale(0.95)", opacity: "0.14" },
+          "75%": { transform: "translate(6px, 78vh) scale(1.1)", opacity: "0.22" },
+          "100%": { transform: "translate(-6px, 100vh) scale(0.9)", opacity: "0.12" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -139,6 +146,7 @@ const config: Config = {
         shimmer: "shimmer 2.5s linear infinite",
         float: "float 6s ease-in-out infinite",
         marquee: "marquee 30s linear infinite",
+        "ember-drift": "ember-drift 22s ease-in-out infinite",
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",

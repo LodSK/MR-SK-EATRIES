@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import { Plus } from "lucide-react";
 import type { FeaturedMeal } from "@/types/menu";
 import { CATEGORY_IMAGE } from "@/lib/constants/media";
@@ -12,6 +13,8 @@ import { cn } from "@/lib/utils/cn";
 import { fadeUp } from "@/lib/animations/variants";
 import { useCart } from "@/lib/hooks/useCart";
 import { useImageReveal } from "@/lib/hooks/useImageReveal";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 interface MealCardProps {
   meal: FeaturedMeal;
@@ -26,13 +29,41 @@ const TAG_STYLES: Record<NonNullable<FeaturedMeal["tag"]>, string> = {
 export function MealCard({ meal }: MealCardProps) {
   const { addItem } = useCart();
   const imageRevealRef = useImageReveal<HTMLDivElement>();
+  const cardRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Sprint 17 — richer GSAP hover (lift + scale + shadow depth) replacing
+  // the plain Framer `whileHover={{ y: -6 }}`; entrance stays on Framer's
+  // `fadeUp` below, this only owns the hover interaction.
+  function handleHoverStart() {
+    if (prefersReducedMotion || !cardRef.current) return;
+    gsap.to(cardRef.current, {
+      y: -8,
+      scale: 1.015,
+      boxShadow: "0 24px 48px -12px rgb(0 0 0 / 0.25)",
+      duration: 0.35,
+      ease: "power2.out",
+    });
+  }
+
+  function handleHoverEnd() {
+    if (prefersReducedMotion || !cardRef.current) return;
+    gsap.to(cardRef.current, {
+      y: 0,
+      scale: 1,
+      boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+      duration: 0.35,
+      ease: "power2.out",
+    });
+  }
 
   return (
     <motion.article
+      ref={cardRef}
       variants={fadeUp}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl"
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
     >
       <div ref={imageRevealRef} className="relative h-52 overflow-hidden">
         <Image

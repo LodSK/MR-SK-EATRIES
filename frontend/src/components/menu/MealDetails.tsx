@@ -14,6 +14,8 @@ import { QuantitySelector } from "@/components/menu/QuantitySelector";
 import { RelatedMeals } from "@/components/menu/RelatedMeals";
 import { MealReviews } from "@/components/menu/MealReviews";
 import { useCart } from "@/lib/hooks/useCart";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 const TAG_VARIANT = {
   New: "accent",
@@ -29,6 +31,25 @@ interface MealDetailsProps {
 export function MealDetails({ item, relatedItems }: MealDetailsProps) {
   const [quantity, setQuantity] = React.useState(1);
   const { addItem } = useCart();
+  const galleryWrapRef = React.useRef<HTMLDivElement | null>(null);
+  const addToCartBtnRef = React.useRef<HTMLButtonElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  React.useEffect(() => {
+    const el = galleryWrapRef.current;
+    if (!el || prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { opacity: 0, scale: 1.06, y: 16 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: "power3.out" }
+      );
+    }, el);
+
+    return () => ctx.revert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item.id]);
 
   function handleAddToCart() {
     addItem(
@@ -42,12 +63,22 @@ export function MealDetails({ item, relatedItems }: MealDetailsProps) {
       },
       quantity
     );
+
+    if (!prefersReducedMotion && addToCartBtnRef.current) {
+      gsap.fromTo(
+        addToCartBtnRef.current,
+        { scale: 1 },
+        { scale: 1.08, duration: 0.15, ease: "power2.out", yoyo: true, repeat: 1 }
+      );
+    }
   }
 
   return (
     <div className="section-container py-12 sm:py-16">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
-        <MealGallery name={item.name} category={item.category} />
+        <div ref={galleryWrapRef}>
+          <MealGallery name={item.name} category={item.category} />
+        </div>
 
         <div className="flex flex-col gap-5">
           <div className="flex flex-wrap items-center gap-2">
@@ -85,7 +116,7 @@ export function MealDetails({ item, relatedItems }: MealDetailsProps) {
 
           <div className="flex flex-col items-start gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
             <QuantitySelector value={quantity} min={1} max={20} onChange={setQuantity} />
-            <Button size="lg" className="w-full sm:w-auto" onClick={handleAddToCart}>
+            <Button ref={addToCartBtnRef} size="lg" className="w-full sm:w-auto" onClick={handleAddToCart}>
               Add to Cart
             </Button>
           </div>

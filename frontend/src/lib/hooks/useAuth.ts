@@ -54,6 +54,28 @@ export function useAuth() {
     [setSession]
   );
 
+  /**
+   * Called once, on mount, by the /auth/callback page Google's OAuth
+   * redirect lands on. The backend already set the httpOnly refresh
+   * cookie during the redirect — this just mints an access token from it
+   * (POST /auth/refresh) and fetches the profile (GET /auth/me), the same
+   * two calls AuthProvider effectively relies on for any existing session,
+   * so no new backend endpoint was needed for this.
+   */
+  const completeExternalLogin = useCallback(async () => {
+    const refreshed = await authApi.refreshSession("");
+    if (!refreshed.success || !refreshed.tokens) {
+      return { success: false, message: refreshed.message };
+    }
+    const profile = await authApi.getCurrentUser();
+    if (!profile.success || !profile.user) {
+      return { success: false, message: profile.message };
+    }
+    setSession(profile.user, refreshed.tokens, true);
+    saveSession(profile.user, refreshed.tokens, true);
+    return { success: true, message: "Signed in.", user: profile.user };
+  }, [setSession]);
+
   const logout = useCallback(async () => {
     await authApi.logout();
     clearSessionState();
@@ -99,6 +121,7 @@ export function useAuth() {
 
     login,
     register,
+    completeExternalLogin,
     logout,
     logoutAllDevices,
     updateProfile,

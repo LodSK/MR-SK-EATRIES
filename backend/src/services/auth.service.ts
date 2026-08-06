@@ -4,6 +4,7 @@ import { hashPassword, comparePassword, generateSecureToken, hashToken } from "@
 import { generateTokenPair, verifyRefreshToken } from "@/utils/jwt";
 import { blacklistRefreshToken, isRefreshTokenBlacklisted } from "@/utils/tokenBlacklist";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/services/email.service";
+import type { GoogleProfile } from "@/services/googleOAuth.service";
 import { env } from "@/config/env";
 import { logger } from "@/config/logger";
 
@@ -59,6 +60,9 @@ export async function registerUser(fullName: string, email: string, password: st
 export async function loginUser(email: string, password: string) {
   const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
   if (!user) throw ApiError.unauthorized("Incorrect email or password.");
+  if (!user.password) {
+    throw ApiError.unauthorized("This account signs in with Google. Use \"Continue with Google\" instead.");
+  }
 
   const matches = await comparePassword(password, user.password);
   if (!matches) throw ApiError.unauthorized("Incorrect email or password.");
@@ -216,6 +220,9 @@ export async function logoutAllDevices(userId: string): Promise<void> {
 export async function changeUserPassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await User.findById(userId).select("+password");
   if (!user) throw ApiError.notFound("Account not found.");
+  if (!user.password) {
+    throw ApiError.badRequest("This account signs in with Google and has no password to change.");
+  }
 
   const matches = await comparePassword(currentPassword, user.password);
   if (!matches) throw ApiError.badRequest("Current password is incorrect.");
@@ -223,4 +230,45 @@ export async function changeUserPassword(userId: string, currentPassword: string
   user.password = await hashPassword(newPassword);
   user.tokenVersion += 1;
   await user.save();
+}
+
+/**
+ * Find-or-create for "Continue with Google". Three paths: an existing
+ * Google-linked account (return it), an existing local account with a
+ * matching, Google-verified email (link googleId onto it rather than
+ * creating a duplicate account), or a brand-new account. Only links/trusts
+ * the email when Google reports it verified — an unverified email could
+ * belong to someone else.
+ */
+export async function findOrCreateGoogleUser(profile: GoogleProfile) {
+  let user = await User.findOne({ googleId: profile.googleId });
+
+  if (!user) {
+    const existingByEmail = await User.findOne({ email: profile.email.toLowerCase() });
+
+    if (existingByEmail) {
+      if (!profile.emailVerified) {
+        throw ApiError.conflict("An account with that email already exists. Log in with your password instead.");
+      }
+      existingByEmail.googleId = profile.googleId;
+      if (!existingByEmail.avatarUrl && profile.avatarUrl) existingByEmail.avatarUrl = profile.avatarUrl;
+      existingByEmail.isEmailVerified = true;
+      user = await existingByEmail.save();
+    } else {
+      user = await User.create({
+        fullName: profile.fullName,
+        email: profile.email.toLowerCase(),
+        googleId: profile.googleId,
+        avatarUrl: profile.avatarUrl,
+        isEmailVerified: profile.emailVerified,
+      });
+    }
+  }
+
+  if (!user.isActive) {
+    throw ApiError.forbidden("This account has been suspended. Please contact support.");
+  }
+
+  const tokens = generateTokenPair(user._id.toString(), user.role, user.tokenVersion);
+  return { user: toPublicUser(user), tokens };
 }

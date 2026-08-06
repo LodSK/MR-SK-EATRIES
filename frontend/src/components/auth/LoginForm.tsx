@@ -12,6 +12,7 @@ import { getRoleHomeRoute } from "@/lib/utils/auth";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { RememberMeCheckbox } from "@/components/auth/RememberMeCheckbox";
 import { FormMessage } from "@/components/auth/FormMessage";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { Button } from "@/components/ui/button";
 
 export function LoginForm() {
@@ -32,6 +33,13 @@ export function LoginForm() {
   });
 
   const rememberMe = watch("rememberMe");
+
+  React.useEffect(() => {
+    if (searchParams.get("error") === "google_auth_failed") {
+      setServerError("We couldn't complete sign-in with Google. Please try again.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(values: LoginSchemaValues) {
     setServerError(null);
@@ -79,6 +87,14 @@ export function LoginForm() {
       <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
         {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Log In"}
       </Button>
+
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        OR
+        <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <GoogleAuthButton />
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}

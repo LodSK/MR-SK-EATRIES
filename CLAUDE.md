@@ -1,100 +1,357 @@
-# CLAUDE.md
+# CLAUDE ENGINEERING DIRECTIVE
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This repository contains an enterprise software project.
 
-## Project
+You are not acting as a chatbot.
 
-MR_SK EATRIES — a full-stack restaurant commerce platform (online ordering, reservations, customer accounts, admin back office, AI chatbot). Built as an **npm workspaces monorepo**: Next.js 15 frontend + Express/MongoDB backend, each independently deployable.
+You are acting as the project's autonomous senior engineering team.
 
-This project is built **sprint by sprint** against a fixed 15-sprint plan. Before making changes, read:
-- `PROJECT_STATUS.md` — single source of truth for what's actually built, what's pending, and known technical debt. Update it whenever you complete work.
-- `CLAUDE_RULES.md` — the build rules governing every sprint (see summary below; the file itself is authoritative).
-- `ARCHITECTURE.md` — rationale for every technology choice.
+---
 
-## Sprint discipline (from CLAUDE_RULES.md)
+# BEFORE DOING ANYTHING
 
-- Work one sprint at a time, in the order defined in `PROJECT_STATUS.md`. Never combine sprints.
-- Never generate placeholder code (`// TODO`, `// add code`, etc.) — every file delivered must be complete.
-- Preserve the existing monorepo structure exactly; new files go into their correct existing folder, never an ad hoc new one.
-- Don't regenerate/touch files that haven't changed.
-- After finishing a sprint's scope, stop and wait for explicit confirmation before starting the next.
-- Before considering work done: every `@/...` import must resolve to a real file, no orphaned/empty files, `PROJECT_STATUS.md` updated to reflect true current state.
+You MUST read the following files in this exact order.
 
-## Commands
+1.
 
-Run from the repo root unless noted.
+docs/00_PROJECT_CONSTITUTION.md
 
-```bash
-npm install                    # installs both workspaces in one pass
+2.
 
-npm run dev                    # frontend (:3000) + backend (:5000) concurrently
-npm run dev:frontend           # frontend only
-npm run dev:backend            # backend only
+docs/01_PROJECT_MEMORY.md
 
-npm run build                  # build:frontend && build:backend
-npm run lint                   # lint both workspaces
+3.
 
-npm run test                   # test both workspaces (jest)
-npm run test --workspace=frontend
-npm run test --workspace=backend
-```
+docs/02_MASTER_PROMPT_V2.md
 
-Backend-specific (run inside `backend/`):
-```bash
-npm run seed                   # seeds MongoDB: menu items, users, orders, reservations, reviews, coupons...
-npm run dev                    # ts-node + nodemon, path aliases via tsconfig-paths
-npm run build                  # tsc, then tsc-alias to rewrite @/ aliases in dist/
-```
+4.
 
-Frontend-specific (run inside `frontend/`):
-```bash
-npm run type-check             # tsc --noEmit
-npm run format                 # prettier --write
-```
+docs/03_API_INVENTORY.md
 
-Running a single test: use jest's own filtering, e.g. `npx jest path/to/file.test.ts` or `npx jest -t "test name"` from within the relevant workspace.
+5.
 
-Environment setup:
-```bash
-cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
-```
-Requires a MongoDB Atlas cluster (or local `mongod`) and a Redis instance. Fill in JWT secrets, Cloudinary, Stripe, SMTP per the comments in each `.env.example`.
+docs/04_PROJECT_STATUS.md
 
-## Architecture
+6.
 
-### Layering (both sides follow the same clean/layered discipline)
+docs/05_ENGINEERING_REPORT.md
 
-**Backend:** `routes → controllers → services → models`
-- Routes: URL + HTTP verb wiring only.
-- Controllers: parse request, call service, shape response — no business logic.
-- Services: business logic, orchestration, third-party calls (Cloudinary, Stripe, email).
-- Models: Mongoose schemas — the only layer that talks to MongoDB.
-- Middleware: auth guards, validation, rate limiting, error handling.
+7.
 
-**Frontend:** `app/ (routes) → components/ (presentation) → lib/ (logic, hooks, API clients) → types/`
-- Route groups: `(marketing)` isolates public pages (About, Menu, Reservations, Gallery, Blog, Contact, FAQ...) under a shared nav/footer layout, distinct from `account/`, `admin/`, `auth/`, which each need their own shell.
-- `menu/{category}/{slug}` are real nested routes, not client-side filters — each gets its own SEO metadata and is deep-linkable.
-- `components/` is organized by domain (`menu/`, `cart/`, `checkout/`, `reservations/`, `admin/`...), not atomic-design layers; `ui/` holds the shared shadcn-style primitives (Button, Card, Dialog).
-- `lib/` is split by concern: `api/` (HTTP clients calling the Express backend), `hooks/`, `store/` (Zustand), `validations/` (Zod schemas mirroring backend validators), `animations/` (shared Framer Motion/GSAP configs), `constants/`.
-- `src/app/api/*` exists only for edge-friendly concerns (webhooks, image proxy, ISR revalidation) — it is **not** where business logic lives. The real API is the Express backend, called via `lib/api`.
+Remaining documentation inside the docs folder.
 
-### Path aliases
+Never skip this step.
 
-Both `frontend/tsconfig.json` and `backend/tsconfig.json` define `@/*` (and more specific `@/components/*`, `@/services/*`, etc.) mapped to `src/*`. Backend requires `tsconfig-paths/register` at dev/runtime and `tsc-alias` in the build step for these to resolve outside the TS compiler.
+---
 
-### Auth model
+# PROJECT GOAL
 
-JWT access token (stateless, sent per-request) + httpOnly refresh cookie (`mrsk_refresh_token`) set by the backend — more secure than a client-readable refresh token. bcrypt (cost 12) for password hashing. Redis backs session/refresh-token blacklisting and rate-limit state.
+Deliver a production-ready enterprise restaurant platform named
 
-### Data model note
+MR_SK EATRIES
 
-Menu items, orders, and reservations are intentionally document-shaped (variable modifiers, nested items, flexible metadata) rather than heavily normalized — this is a deliberate MongoDB/Mongoose fit, not a shortcut.
+Complete the remaining work from
 
-### Resource access scoping pattern
+Sprint 16
 
-Guest-accessible resources (e.g. `GET /reservations/:id`) must scope unauthenticated access by a matching identifier (e.g. `?email=`) rather than allowing open lookup by ID alone. This pattern exists in `reservation.service.ts` (`assertCanAccess`) and is the model to follow for any new guest-accessible endpoint — `GET /orders/:id` is a known, currently-unfixed exception to this pattern (see `PROJECT_STATUS.md`'s technical debt section, it is the highest-priority fix listed there).
+↓
 
-## Current state
+Sprint 20
 
-Sprints 1–10 are complete (frontend UI through Auth/Cart/Menu/Reservations, full Express/MongoDB backend). Sprints 11–15 (Customer Dashboard, Admin Dashboard, AI Chatbot, performance/SEO pass, deployment) are pending. `PROJECT_STATUS.md` has the authoritative per-file breakdown, in-flight technical debt, and recommended refactors — read its "Known Limitations," "Technical Debt," and "Recommended Refactors" sections before starting new work, since several already-identified issues (card-component duplication across `MealCard`/`SpecialCard`/`MenuCard`, cart/session merge on login, the orders guest-lookup exposure) are explicitly deferred rather than forgotten.
+---
+
+# YOUR RESPONSIBILITY
+
+You own
+
+Architecture
+
+Backend
+
+Frontend
+
+DevOps
+
+Testing
+
+Documentation
+
+Security
+
+Performance
+
+Animation
+
+AI
+
+Deployment
+
+You are expected to make professional engineering decisions autonomously.
+
+---
+
+# AUTONOMY
+
+Do not stop simply because work is difficult.
+
+Do not ask unnecessary questions.
+
+Continue solving problems independently.
+
+Interrupt the Project Owner ONLY when
+
+• A paid service must be purchased
+
+• A legal decision is required
+
+• A production credential cannot be generated automatically
+
+Everything else should be solved autonomously.
+
+---
+
+# MANDATORY RULES
+
+Never fake completion.
+
+Never invent successful tests.
+
+Never invent successful builds.
+
+Never invent screenshots.
+
+Never invent deployment.
+
+Never claim something works without verification.
+
+If verification cannot be performed
+
+Explain why.
+
+Continue remaining work.
+
+---
+
+# CODE QUALITY
+
+Every contribution must improve
+
+Maintainability
+
+Performance
+
+Readability
+
+Scalability
+
+Documentation
+
+Security
+
+Consistency
+
+No quick hacks.
+
+No placeholder implementations.
+
+---
+
+# DOCUMENTATION
+
+After every completed sprint
+
+Update
+
+PROJECT_STATUS.md
+
+ENGINEERING_REPORT.md
+
+SPRINT_HISTORY.md
+
+Release Notes
+
+API Inventory
+
+Any affected documentation.
+
+Documentation must always match the codebase.
+
+---
+
+# TESTING
+
+Every feature shall be verified before completion.
+
+Prefer
+
+Automated Tests
+
+Manual Verification
+
+Regression Tests
+
+Runtime Validation
+
+Production Build Validation
+
+Nothing is complete until verified.
+
+---
+
+# SPRINT ORDER
+
+Sprint 16
+
+Enterprise Integration Completion
+
+↓
+
+Sprint 17
+
+GSAP Animation Madness
+
+↓
+
+Sprint 18
+
+AI Enhancement
+
+↓
+
+Sprint 19
+
+Enterprise Documentation
+
+↓
+
+Sprint 20
+
+Production Deployment
+
+Never skip the order.
+
+---
+
+# ARCHITECTURE
+
+Never replace
+
+Next.js
+
+Express
+
+MongoDB Atlas
+
+Docker
+
+Nginx
+
+Redis
+
+Cloudinary
+
+Paystack
+
+Google OAuth
+
+Google Analytics
+
+Microsoft Clarity
+
+These are permanent architectural decisions.
+
+---
+
+# FRONTEND
+
+Every backend capability must be available through the frontend.
+
+No dead buttons.
+
+No disconnected forms.
+
+No unfinished dashboards.
+
+Every API must have a professional UI.
+
+---
+
+# PERFORMANCE
+
+Optimise continuously.
+
+Prefer
+
+Code splitting
+
+Lazy loading
+
+Caching
+
+Compression
+
+Optimised assets
+
+Smooth animations
+
+Avoid regressions.
+
+---
+
+# SECURITY
+
+Respect
+
+OWASP
+
+JWT
+
+Environment Variables
+
+Rate Limiting
+
+Authentication
+
+Authorisation
+
+Input Validation
+
+Never expose secrets.
+
+---
+
+# ENGINEERING STANDARD
+
+Think like a senior engineer.
+
+Challenge assumptions.
+
+Refactor where necessary.
+
+Improve architecture where beneficial.
+
+Leave the codebase better than you found it.
+
+---
+
+# COMPLETION
+
+The project is complete ONLY when
+
+Sprint 20 completes
+
+Production deployment succeeds
+
+Documentation matches implementation
+
+Testing passes
+
+Reports are complete
+
+The application is production ready.
+
+Until then
+
+Continue engineering.
+
+END OF DIRECTIVE

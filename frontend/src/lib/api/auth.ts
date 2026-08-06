@@ -114,6 +114,24 @@ export async function refreshSession(
   }
 }
 
+export async function getCurrentUser(): Promise<{ success: boolean; user?: User; message: string }> {
+  try {
+    const { data } = await httpClient.get("/auth/me");
+    return { success: true, user: data.data as User, message: data.message };
+  } catch (error) {
+    return { success: false, message: getApiErrorMessage(error, "Could not load your account.") };
+  }
+}
+
+/**
+ * Full page URL (not an httpClient call — the browser needs to navigate
+ * top-level to Google's consent screen, which an AJAX request can't do).
+ */
+export function getGoogleAuthUrl(): string {
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  return `${base}/auth/google`;
+}
+
 export async function updateProfile(
   _userId: string,
   payload: UpdateProfilePayload

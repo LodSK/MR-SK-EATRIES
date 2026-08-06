@@ -10,6 +10,8 @@ const router = Router();
 router.post("/orders", optionalAuthenticate, validate(createOrderSchema), orderController.createOrder);
 router.get("/orders/history", authenticate, orderController.getOrderHistory);
 router.get("/orders/track/:orderNumber", optionalAuthenticate, orderController.trackOrder);
+router.get("/orders/pay/verify", optionalAuthenticate, orderController.verifyPayment);
+router.post("/orders/:id/pay/initialize", optionalAuthenticate, orderController.initializePayment);
 router.get("/orders/:id", optionalAuthenticate, orderController.getOrder);
 
 router.get("/admin/orders", authenticate, authorize(...STAFF_ROLES), orderController.listOrders);

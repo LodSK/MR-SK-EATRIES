@@ -12,6 +12,7 @@ import { ChatWidgetLoader } from "@/components/ai/ChatWidgetLoader";
 import { SmoothScrollProvider } from "@/components/shared/SmoothScrollProvider";
 import { PageTransition } from "@/components/shared/PageTransition";
 import { RestaurantSchema } from "@/components/shared/RestaurantSchema";
+import { AnalyticsScripts } from "@/components/shared/AnalyticsScripts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.url),
@@ -65,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${fontVariables} font-body`}>
+        <AnalyticsScripts />
         <RestaurantSchema />
         <ThemeProvider>
           <AuthProvider>

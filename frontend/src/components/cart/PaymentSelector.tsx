@@ -10,7 +10,7 @@ interface PaymentSelectorProps {
 }
 
 const OPTIONS: { method: PaymentMethod; label: string; icon: typeof CreditCard }[] = [
-  { method: "card", label: "Card", icon: CreditCard },
+  { method: "card", label: "Card (Paystack)", icon: CreditCard },
   { method: "mobile-money", label: "Mobile Money", icon: Smartphone },
   { method: "cash", label: "Cash", icon: Banknote },
 ];

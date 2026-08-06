@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { PasswordStrength } from "@/components/auth/PasswordStrength";
 import { FormMessage } from "@/components/auth/FormMessage";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
@@ -118,6 +119,14 @@ export function RegisterForm() {
       <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
         {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create Account"}
       </Button>
+
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        OR
+        <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <GoogleAuthButton />
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

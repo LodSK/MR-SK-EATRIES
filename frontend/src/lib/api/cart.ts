@@ -50,11 +50,30 @@ export async function submitOrder(
       instructions: values.instructions,
     });
 
+    const order = data.data;
+
+    // "card" orders aren't confirmed yet — start the Paystack transaction
+    // right away and send the caller the checkout URL instead of a
+    // confirmation message. Guest orders authenticate this call the same
+    // way order lookups do elsewhere: a matching ?email= query param.
+    if (values.paymentMethod === "card") {
+      const emailParam = order.guestEmail ? `?email=${encodeURIComponent(order.guestEmail)}` : "";
+      const { data: payment } = await httpClient.post(`/orders/${order._id}/pay/initialize${emailParam}`);
+
+      return {
+        success: true,
+        orderId: order.orderNumber,
+        message: "Redirecting you to Paystack…",
+        estimatedDeliveryMinutes: order.estimatedDeliveryMinutes,
+        requiresRedirect: payment.data.authorizationUrl,
+      };
+    }
+
     return {
       success: true,
-      orderId: data.data.orderNumber,
+      orderId: order.orderNumber,
       message: "Your order has been placed.",
-      estimatedDeliveryMinutes: data.data.estimatedDeliveryMinutes,
+      estimatedDeliveryMinutes: order.estimatedDeliveryMinutes,
     };
   } catch (error) {
     return {

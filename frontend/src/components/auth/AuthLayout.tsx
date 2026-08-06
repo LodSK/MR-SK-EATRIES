@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { SITE_CONFIG } from "@/config/site";
+import { fadeUp } from "@/lib/animations/variants";
 
 interface AuthLayoutProps {
   title: string;
@@ -34,13 +38,19 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         </div>
       </div>
 
-      {/* Form panel */}
+      {/* Form panel — light entrance only; this is a low-stakes utility
+          flow, not a moment worth slowing down (Sprint 17 Tier 2). */}
       <div className="flex items-center justify-center px-5 py-16 sm:px-10">
-        <div className="w-full max-w-sm">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-sm"
+        >
           <h1 className="font-display text-2xl font-bold sm:text-3xl">{title}</h1>
           {subtitle && <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>}
           <div className="mt-8">{children}</div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

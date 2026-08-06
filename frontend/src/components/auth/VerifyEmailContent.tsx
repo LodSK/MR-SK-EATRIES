@@ -3,9 +3,11 @@
 import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { fadeUp } from "@/lib/animations/variants";
 
 export function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -31,7 +33,12 @@ export function VerifyEmailContent() {
   }, [token]);
 
   return (
-    <div className="section-container flex flex-col items-center gap-4 py-24 text-center">
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+      className="section-container flex flex-col items-center gap-4 py-24 text-center"
+    >
       {status === "checking" && (
         <>
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -64,6 +71,6 @@ export function VerifyEmailContent() {
           </Button>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

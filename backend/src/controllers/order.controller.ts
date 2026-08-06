@@ -1,11 +1,29 @@
 import type { Request, Response } from "express";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { ApiResponse } from "@/utils/ApiResponse";
+import { ApiError } from "@/utils/ApiError";
 import * as orderService from "@/services/order.service";
 
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
   const order = await orderService.createOrder({ ...req.body, userId: req.user?.id });
   return ApiResponse.created(res, order, "Order placed.");
+});
+
+export const initializePayment = asyncHandler(async (req: Request, res: Response) => {
+  const result = await orderService.initializeOrderPayment(req.params.id as string, {
+    userId: req.user?.id,
+    role: req.user?.role,
+    email: req.query.email as string | undefined,
+  });
+  return ApiResponse.ok(res, result, "Payment initialized.");
+});
+
+export const verifyPayment = asyncHandler(async (req: Request, res: Response) => {
+  const { reference } = req.query as { reference?: string };
+  if (!reference) throw ApiError.badRequest("A payment reference is required.");
+
+  const { order, paid } = await orderService.verifyOrderPayment(reference);
+  return ApiResponse.ok(res, { order, paid }, paid ? "Payment verified." : "Payment was not successful.");
 });
 
 export const getOrder = asyncHandler(async (req: Request, res: Response) => {

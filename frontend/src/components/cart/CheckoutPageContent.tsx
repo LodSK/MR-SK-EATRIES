@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import type { SubmitOrderResult } from "@/types/cart";
 import { useCart } from "@/lib/hooks/useCart";
 import { CheckoutForm } from "@/components/cart/CheckoutForm";
@@ -11,6 +11,7 @@ import { OrderSummary } from "@/components/cart/OrderSummary";
 import { EmptyCart } from "@/components/cart/EmptyCart";
 import { Button } from "@/components/ui/button";
 import { fadeUp } from "@/lib/animations/variants";
+import { AnimatedCheckmark } from "@/components/cart/AnimatedCheckmark";
 
 export function CheckoutPageContent() {
   const { items, totals, deliveryMethod, hasHydrated } = useCart();
@@ -27,7 +28,7 @@ export function CheckoutPageContent() {
         className="section-container flex flex-col items-center gap-5 py-24 text-center"
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-          <CheckCircle2 className="h-8 w-8" />
+          <AnimatedCheckmark className="h-8 w-8" />
         </div>
         <h1 className="font-display text-3xl font-bold">Order Placed!</h1>
         <p className="max-w-md text-muted-foreground">{orderResult.message}</p>

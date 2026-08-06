@@ -20,6 +20,58 @@ interface HeroProps {
   videoSrc?: string;
 }
 
+/**
+ * Sprint 17 — subtle steam/smoke drift behind the hero image. Deliberately
+ * not a canvas/particle system (the animation plan rules that out on
+ * performance grounds): three blurred gradient wisps, same visual language
+ * as the existing placeholder gradient blobs below, looped with GSAP.
+ * Static (no loop) under prefers-reduced-motion rather than hidden — it
+ * still reads as atmospheric lighting even without the drift.
+ */
+function SteamDrift({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
+  const wispRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const wisps = wispRefs.current.filter((el): el is HTMLDivElement => el !== null);
+    if (wisps.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      wisps.forEach((el, i) => {
+        gsap.to(el, {
+          y: -28 - i * 6,
+          x: i % 2 === 0 ? 14 : -14,
+          opacity: 0.5,
+          duration: 5 + i,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          delay: i * 0.6,
+        });
+      });
+    });
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          ref={(el) => {
+            wispRefs.current[i] = el;
+          }}
+          className="absolute h-40 w-40 rounded-full bg-white/[0.07] opacity-30 blur-3xl"
+          style={{
+            left: `${28 + i * 22}%`,
+            top: `${38 - i * 8}%`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function Hero({ imageSrc, videoSrc }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -107,6 +159,8 @@ export function Hero({ imageSrc, videoSrc }: HeroProps) {
           </div>
         )}
       </motion.div>
+
+      <SteamDrift prefersReducedMotion={prefersReducedMotion} />
 
       {/* Legibility overlay — the gradient alone (tuned in tailwind.config.ts)
           already carries bottom-weighted legibility; this flat layer is

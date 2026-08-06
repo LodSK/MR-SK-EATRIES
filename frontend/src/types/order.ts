@@ -23,6 +23,8 @@ export interface Order {
   couponCode?: string;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethodType;
+  paymentStatus: "pending" | "paid" | "failed" | "refunded";
+  paymentReference?: string;
   status: OrderStatus;
   customerName: string;
   customerEmail: string;

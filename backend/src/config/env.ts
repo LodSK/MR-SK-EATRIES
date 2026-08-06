@@ -46,6 +46,25 @@ export const env = {
     apiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
   },
 
+  googleOAuth: {
+    clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL ?? "",
+  },
+
+  paystack: {
+    publicKey: process.env.PAYSTACK_PUBLIC_KEY ?? "",
+    secretKey: process.env.PAYSTACK_SECRET_KEY ?? "",
+    /** Paystack signs webhook payloads with the integration secret key
+     * itself (HMAC-SHA512), not a separate webhook secret — despite the
+     * env var name, no distinct "webhook secret" exists to obtain from
+     * Paystack's dashboard. Kept only in case a future Paystack account
+     * setting introduces one; unused by paystack.service.ts today. */
+    webhookSecret: process.env.PAYSTACK_WEBHOOK_SECRET ?? "",
+  },
+
+  googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? "",
+
   rateLimit: {
     windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 900000),
     max: Number(process.env.RATE_LIMIT_MAX_REQUESTS ?? 100),

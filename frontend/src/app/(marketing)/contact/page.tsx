@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MapPin, Mail, Phone, Clock } from "lucide-react";
 import { PageHero } from "@/components/shared/PageHero";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { LocationMap } from "@/components/contact/LocationMap";
 import { SITE_CONFIG } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -58,6 +59,8 @@ export default function ContactPage() {
                 ))}
               </ul>
             </div>
+
+            <LocationMap address={SITE_CONFIG.contact.address} />
           </div>
 
           <ContactForm />

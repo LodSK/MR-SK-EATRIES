@@ -4,13 +4,67 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { AlertCircle, CheckCircle2, Loader2, Mail, Send } from "lucide-react";
+import { AlertCircle, Loader2, Mail, Send } from "lucide-react";
 import { newsletterSchema, type NewsletterFormValues } from "@/lib/validations/newsletter";
 import { subscribeToNewsletter } from "@/lib/api/newsletter";
 import { Button } from "@/components/ui/button";
 import { fadeUp, staggerContainer } from "@/lib/animations/variants";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
+
+/** Sprint 17 — a real inline SVG (not the lucide icon) so its stroke can be
+ * GSAP-drawn on success; a checkmark "arriving" reads as more of a payoff
+ * moment than a static icon fading in. */
+function AnimatedCheckmark() {
+  const circleRef = React.useRef<SVGCircleElement>(null);
+  const checkRef = React.useRef<SVGPathElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  React.useEffect(() => {
+    if (prefersReducedMotion || !circleRef.current || !checkRef.current) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline();
+      tl.fromTo(
+        circleRef.current,
+        { strokeDashoffset: 63 },
+        { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }
+      ).fromTo(
+        checkRef.current,
+        { strokeDashoffset: 20 },
+        { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" },
+        "-=0.15"
+      );
+    });
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
+
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle
+        ref={circleRef}
+        cx="10"
+        cy="10"
+        r="9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeDasharray="63"
+        strokeDashoffset={prefersReducedMotion ? 0 : undefined}
+      />
+      <path
+        ref={checkRef}
+        d="M6 10.5l2.5 2.5L14 7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray="20"
+        strokeDashoffset={prefersReducedMotion ? 0 : undefined}
+      />
+    </svg>
+  );
+}
 
 export function Newsletter() {
   const [state, setState] = React.useState<SubmitState>("idle");
@@ -89,7 +143,7 @@ export function Newsletter() {
               disabled={state === "submitting"}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "newsletter-email-error" : undefined}
-              className="h-12 w-full rounded-md border border-white/15 bg-white/5 px-4 text-sm text-white placeholder:text-white/40 focus-visible:border-brand-accent disabled:opacity-60"
+              className="h-12 w-full rounded-md border border-white/15 bg-white/5 px-4 text-sm text-white placeholder:text-white/40 transition-shadow duration-300 focus-visible:border-brand-accent focus-visible:ring-4 focus-visible:ring-brand-accent/20 disabled:opacity-60"
               {...register("email")}
             />
             {errors.email && (
@@ -127,7 +181,7 @@ export function Newsletter() {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-2 text-sm font-medium text-brand-accent"
             >
-              <CheckCircle2 className="h-4 w-4" />
+              <AnimatedCheckmark />
               You&apos;re on the list — welcome to MR_SK EATRIES!
             </motion.p>
           )}

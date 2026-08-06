@@ -31,7 +31,17 @@ export function createApp(): Application {
   );
   app.use(compression());
   app.use(cookieParser());
-  app.use(express.json({ limit: "1mb" }));
+  app.use(
+    express.json({
+      limit: "1mb",
+      // Stashes the exact bytes Paystack signed, before body-parser
+      // re-serializes them into req.body — the webhook handler HMACs this,
+      // not JSON.stringify(req.body), since those aren't guaranteed identical.
+      verify: (req, _res, buf) => {
+        (req as express.Request).rawBody = buf;
+      },
+    })
+  );
   app.use(express.urlencoded({ extended: true }));
   app.use(mongoSanitize());
   app.use(hpp());

@@ -3,7 +3,7 @@ import { getMenuCategories, getMenuItems, getFeaturedMenuItems } from "@/lib/api
 import { MENU_PRICE_BOUNDS } from "@/lib/constants/menu-data";
 import { PageHero } from "@/components/shared/PageHero";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import { CategoryCard } from "@/components/home/CategoryCard";
+import { MenuCategoryGrid } from "@/components/menu/MenuCategoryGrid";
 import { MenuGrid } from "@/components/menu/MenuGrid";
 import { MenuBrowser } from "@/components/menu/MenuBrowser";
 import { AIMenuAssistant } from "@/components/ai/AIMenuAssistant";
@@ -36,11 +36,7 @@ export default async function MenuLandingPage() {
           title="Category Overview"
           className="mx-auto mb-12 max-w-3xl"
         />
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
-          {categories.map((category) => (
-            <CategoryCard key={category.slug} category={category} />
-          ))}
-        </div>
+        <MenuCategoryGrid categories={categories} />
       </section>
 
       <section className="bg-muted/40 py-16 sm:py-20" aria-labelledby="featured-heading">

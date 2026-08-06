@@ -18,6 +18,7 @@ import aiRoutes from "@/routes/ai.routes";
 import contactRoutes from "@/routes/contact.routes";
 import blogRoutes from "@/routes/blog.routes";
 import jobApplicationRoutes from "@/routes/job-application.routes";
+import paymentRoutes from "@/routes/payment.routes";
 
 const router = Router();
 
@@ -40,5 +41,6 @@ router.use(aiRoutes);
 router.use(contactRoutes);
 router.use(blogRoutes);
 router.use(jobApplicationRoutes);
+router.use(paymentRoutes);
 
 export default router;

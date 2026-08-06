@@ -7,6 +7,8 @@ import { TESTIMONIALS } from "@/lib/constants/testimonials-data";
 import { TestimonialCard } from "@/components/home/TestimonialCard";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { cn } from "@/lib/utils/cn";
+import { gsap } from "@/lib/animations/gsap";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 const AUTOPLAY_INTERVAL_MS = 6000;
 
@@ -14,6 +16,36 @@ export function Testimonials() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [isPaused, setIsPaused] = React.useState(false);
+  const carouselWrapRef = React.useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Sprint 17 — gentle scroll-scrubbed parallax on the carousel block. Per-card
+  // parallax isn't viable here (Embla already owns each card's transform for
+  // horizontal paging); the whole block drifting slightly against the page
+  // scroll still reads as depth/storytelling without fighting the carousel.
+  React.useEffect(() => {
+    const el = carouselWrapRef.current;
+    if (!el || prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { y: 40 },
+        {
+          y: -40,
+          ease: "none",
+          scrollTrigger: {
+            trigger: el,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
   const scrollPrev = React.useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = React.useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
@@ -52,7 +84,7 @@ export function Testimonials() {
         className="mx-auto mb-14 max-w-3xl"
       />
 
-      <div className="relative mx-auto max-w-5xl">
+      <div ref={carouselWrapRef} className="relative mx-auto max-w-5xl">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="-ml-4 flex sm:-ml-6">
             {TESTIMONIALS.map((testimonial) => (
