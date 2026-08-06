@@ -16,6 +16,14 @@ export const env = {
   port: Number(process.env.PORT ?? 5000),
   apiVersion: process.env.API_VERSION ?? "v1",
   clientUrl: process.env.CLIENT_URL ?? "http://localhost:3000",
+  /** CORS allow-list, derived from CLIENT_URL plus an optional comma-separated
+   * CORS_ORIGINS override — e.g. "https://app.netlify.app,http://localhost:3000"
+   * so a deployed frontend and local dev can both reach the same backend.
+   * Resolves the standing "CORS is a single static origin" debt item. */
+  corsOrigins: (process.env.CORS_ORIGINS ?? process.env.CLIENT_URL ?? "http://localhost:3000")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 
   mongoUri: required("MONGODB_URI", "mongodb://127.0.0.1:27017/mrsk_eatries"),
 

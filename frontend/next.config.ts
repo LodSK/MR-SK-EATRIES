@@ -30,8 +30,11 @@ const nextConfig: NextConfig = {
   // Self-contained server build (only the files actually needed at runtime,
   // traced dependencies copied in) — Sprint 15's Docker image runs this
   // instead of the full node_modules tree, dramatically shrinking the
-  // final image.
-  output: "standalone",
+  // final image. Skipped when building on Netlify (which sets NETLIFY=true
+  // in its build environment automatically): Netlify's own Next.js runtime
+  // wraps the standard `.next` build output in its own functions and does
+  // not expect the slimmed `.next/standalone` layout this mode produces.
+  output: process.env.NETLIFY ? undefined : "standalone",
 
   images: {
     remotePatterns: [

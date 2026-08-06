@@ -25,7 +25,19 @@ export function createApp(): Application {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.clientUrl,
+      // Function form (not a static string) so the deployed frontend and
+      // local dev can both be allowed at once, per env.corsOrigins — see
+      // its definition in config/env.ts. Requests with no Origin header
+      // (server-to-server calls, curl, the /health check) are allowed
+      // through since there's no browser same-origin policy to enforce
+      // for them in the first place.
+      origin: (origin, callback) => {
+        if (!origin || env.corsOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
     })
   );

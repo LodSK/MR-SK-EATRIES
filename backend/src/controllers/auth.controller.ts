@@ -13,7 +13,13 @@ const OAUTH_STATE_COOKIE = "mrsk_oauth_state";
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: env.isProduction,
-  sameSite: "lax" as const,
+  // "none" in production: the frontend (Netlify) and backend (Render) are
+  // deployed on different registrable domains, and a cross-site fetch with
+  // credentials:true only carries a cookie whose SameSite policy is "none"
+  // (which browsers additionally require Secure for — already true above).
+  // "lax" in dev, where frontend/backend both run on localhost and this
+  // never crosses a site boundary.
+  sameSite: (env.isProduction ? "none" : "lax") as "none" | "lax",
   path: "/",
 };
 

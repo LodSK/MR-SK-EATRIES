@@ -1,0 +1,28 @@
+# Netlify deploy config — frontend only. Build context is the repo root
+# (not frontend/) because this is an npm-workspaces monorepo: `frontend`
+# has no lockfile of its own, so `npm ci` has to run where
+# package-lock.json actually lives, exactly like backend/Dockerfile and
+# frontend/Dockerfile already do for the Docker path.
+#
+# Required site environment variables (set in Netlify's dashboard —
+# Site configuration -> Environment variables, not here, since they point
+# at a specific deployed backend and shouldn't be hardcoded into source):
+#   NEXT_PUBLIC_API_BASE_URL       e.g. https://mrsk-eatries-api.onrender.com/api/v1
+#   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+#   NEXT_PUBLIC_GA_MEASUREMENT_ID       (optional — Analytics component no-ops if unset)
+#   NEXT_PUBLIC_CLARITY_PROJECT_ID      (optional — same)
+# See docs/06_DEPLOYMENT_GUIDE.md for the full list and where each value
+# comes from.
+
+[build]
+  command = "npm ci && npm run build --workspace=frontend"
+  publish = "frontend/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Netlify sets NETLIFY=true automatically during builds — next.config.ts
+  # reads it to skip `output: "standalone"` (a Docker-only concern; Netlify's
+  # own Next.js runtime expects the standard .next build layout instead).
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

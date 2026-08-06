@@ -1,0 +1,103 @@
+# Render Blueprint — backend only, using the existing backend/Dockerfile
+# (already built and health-checked for Sprint 15's Docker path) rather
+# than a separate native-runtime build config, so this deploys the exact
+# same image that's already been verified.
+#
+# Values with `sync: false` are deliberately NOT stored here — Render will
+# prompt for them once when the Blueprint is applied, and they're managed
+# from the service's own Environment tab afterward. Nothing secret belongs
+# in this file, since it's committed to the repo. See
+# docs/06_DEPLOYMENT_GUIDE.md for what each one is and where its value
+# comes from (mostly: whatever's already in your local backend/.env).
+#
+# No Redis service is declared here: Render's free tier has no free
+# managed Redis/Key Value offering, and this app already treats Redis as
+# an optional soft dependency (rate limiting and session-revocation
+# degrade to in-memory/no-op without it — see backend/src/config/redis.ts
+# and app.ts's /health check). Leaving REDIS_URL unset is a disclosed,
+# acceptable limitation for a free-tier development deployment, not a
+# broken feature.
+
+services:
+  - type: web
+    name: mrsk-eatries-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_VERSION
+        value: v1
+      - key: BCRYPT_SALT_ROUNDS
+        value: "12"
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "100"
+      - key: LOG_LEVEL
+        value: info
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: JWT_COOKIE_NAME
+        value: mrsk_refresh_token
+      - key: AI_PROVIDER
+        value: groq
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: AI_MAX_TOKENS
+        value: "1024"
+      # Deployment-specific — must point at the real Netlify URL and Atlas
+      # cluster once those exist; can't be filled in until then.
+      - key: CLIENT_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      # Secrets — generate fresh, never reuse local dev values.
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      # Carried over from local backend/.env — real values already exist.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: PAYSTACK_WEBHOOK_SECRET
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ADMIN_SEED_EMAIL
+        sync: false
+      - key: ADMIN_SEED_PASSWORD
+        sync: false
