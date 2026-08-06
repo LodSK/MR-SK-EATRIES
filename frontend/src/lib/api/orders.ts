@@ -1,3 +1,4 @@
+import axios from "axios";
 import { httpClient, getApiErrorMessage } from "@/lib/api/httpClient";
 import type { Order } from "@/types/order";
 
@@ -48,10 +49,22 @@ export async function verifyPayment(
   reference: string
 ): Promise<{ success: boolean; paid: boolean; message: string; order?: Order }> {
   try {
-    const { data } = await httpClient.get("/orders/pay/verify", { params: { reference } });
+    // 60s: generous enough to ride out a Render free-tier cold start
+    // (documented as 30-60s) rather than timing out mid-boot and reporting
+    // a false failure. httpClient has no default timeout, so without this
+    // a genuinely stuck connection would hang the /checkout/verify page's
+    // spinner indefinitely with no way out.
+    const { data } = await httpClient.get("/orders/pay/verify", { params: { reference }, timeout: 60000 });
     return { success: true, paid: data.data.paid, message: data.message, order: normalizeOrder(data.data.order) };
   } catch (error) {
-    return { success: false, paid: false, message: getApiErrorMessage(error, "We couldn't verify this payment.") };
+    const isTimeout = axios.isAxiosError(error) && error.code === "ECONNABORTED";
+    return {
+      success: false,
+      paid: false,
+      message: isTimeout
+        ? "This is taking longer than expected. Your payment may still be processing — check your order history in a moment before retrying."
+        : getApiErrorMessage(error, "We couldn't verify this payment."),
+    };
   }
 }
 
