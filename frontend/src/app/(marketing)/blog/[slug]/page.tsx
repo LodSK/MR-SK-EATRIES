@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { CalendarDays, UtensilsCrossed, User } from "lucide-react";
+import { CalendarDays, User } from "lucide-react";
 import { PageHero } from "@/components/shared/PageHero";
 import { Badge } from "@/components/shared/Badge";
 import { getBlogPostBySlug } from "@/lib/api/blog";
@@ -25,7 +25,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) notFound();
 
   const paragraphs = post.content.split(/\n\n+/).filter(Boolean);
-  const coverImage = BLOG_COVER_IMAGE[post.slug];
+  const coverImage = BLOG_COVER_IMAGE[post.slug] ?? "/images/gallery/ambiance-kitchen.jpg";
   const publishedDate = post.publishedAt ?? post.createdAt;
 
   const jsonLd = {
@@ -33,7 +33,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    image: coverImage ? [`${SITE_CONFIG.url}${coverImage}`] : undefined,
+        image: [`${SITE_CONFIG.url}${coverImage}`],
     author: { "@type": "Person", name: post.author },
     publisher: { "@type": "Organization", name: SITE_CONFIG.name },
     datePublished: publishedDate,
@@ -48,6 +48,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <PageHero
+        imageSrc={coverImage}
         eyebrow={post.tags[0] ?? "From the Kitchen"}
         title={post.title}
         subtitle={post.excerpt}
@@ -78,14 +79,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <div className="relative mb-10 h-56 overflow-hidden rounded-2xl sm:h-80">
-          {coverImage ? (
-            <Image src={coverImage} alt={post.title} fill priority className="object-cover" sizes="(min-width: 1024px) 768px, 100vw" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark">
-              <div className="bg-noise absolute inset-0 opacity-[0.05]" aria-hidden="true" />
-              <UtensilsCrossed className="h-16 w-16 text-white/25" strokeWidth={1.25} />
-            </div>
-          )}
+          <Image src={coverImage} alt={post.title} fill priority className="object-cover" sizes="(min-width: 1024px) 768px, 100vw" />
         </div>
 
         <div className="flex flex-col gap-5 text-base leading-relaxed text-muted-foreground">

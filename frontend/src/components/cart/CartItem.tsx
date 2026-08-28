@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import type { CartItem as CartItemType } from "@/types/cart";
 import { CATEGORY_ICON } from "@/lib/constants/category-icons";
+import { CATEGORY_IMAGE } from "@/lib/constants/media";
 import { formatCurrency } from "@/lib/utils/cart";
 import { useCart } from "@/lib/hooks/useCart";
 import { QuantitySelector } from "@/components/menu/QuantitySelector";
@@ -33,12 +35,11 @@ export function CartItem({ item, compact = false }: CartItemProps) {
   return (
     <div className="flex items-center gap-3 py-4">
       <div
-        className={`flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark ${
+        className={`relative shrink-0 overflow-hidden rounded-xl ${
           compact ? "h-14 w-14" : "h-16 w-16"
         }`}
-        aria-hidden="true"
       >
-        <Icon className={compact ? "h-6 w-6 text-white/30" : "h-7 w-7 text-white/30"} strokeWidth={1.25} />
+        <Image src={CATEGORY_IMAGE[item.category]} alt="" fill sizes={compact ? "56px" : "64px"} className="object-cover" />
       </div>
 
       <div className="flex flex-1 flex-col gap-1">

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Plus } from "lucide-react";
 import type { MenuItem } from "@/types/menu";
-import { CATEGORY_ICON } from "@/lib/constants/category-icons";
+import { CATEGORY_IMAGE } from "@/lib/constants/media";
 import { Rating } from "@/components/shared/Rating";
 import { PriceTag } from "@/components/menu/PriceTag";
 import { Button } from "@/components/ui/button";
@@ -16,12 +17,11 @@ interface FavoriteCardProps {
 
 export function FavoriteCard({ item, onRemove }: FavoriteCardProps) {
   const { addItem } = useCart();
-  const Icon = CATEGORY_ICON[item.category];
-
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark">
-        <Icon className="h-10 w-10 text-white/25" strokeWidth={1.25} />
+      <div className="relative h-32 overflow-hidden">
+        <Image src={item.images?.[0] ?? CATEGORY_IMAGE[item.category]} alt={item.name} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" aria-hidden="true" />
         <button
           type="button"
           onClick={() => onRemove(item.id)}

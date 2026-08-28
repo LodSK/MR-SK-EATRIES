@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, UtensilsCrossed } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import type { BlogPost } from "@/types/blog";
 import { BLOG_COVER_IMAGE } from "@/lib/constants/media";
 import { Badge } from "@/components/shared/Badge";
@@ -13,7 +13,7 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post }: BlogCardProps) {
-  const coverImage = BLOG_COVER_IMAGE[post.slug];
+  const coverImage = BLOG_COVER_IMAGE[post.slug] ?? "/images/gallery/ambiance-kitchen.jpg";
   const imageRevealRef = useImageReveal<HTMLDivElement>();
 
   return (
@@ -22,23 +22,13 @@ export function BlogCard({ post }: BlogCardProps) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl"
     >
       <div ref={imageRevealRef} className="relative h-40 overflow-hidden">
-        {coverImage ? (
-          <Image
-            src={coverImage}
-            alt={post.title}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark">
-            <div className="bg-noise absolute inset-0 opacity-[0.05]" aria-hidden="true" />
-            <UtensilsCrossed
-              className="h-10 w-10 text-white/25 transition-transform duration-500 group-hover:scale-110"
-              strokeWidth={1.25}
-            />
-          </div>
-        )}
+        <Image
+          src={coverImage}
+          alt={post.title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
