@@ -26,6 +26,7 @@ The owner approved a two-phase UI and image improvement program on 2026-08-28.
 
 - Phase 1 started: per-item image fallback support, page-hero imagery, social gallery imagery, and hero alt-text correction.
 - Phase 2 started: category cards are now image-led and meal detail galleries prefer real `MenuItem.images[]` when present.
+- Events visual pass added: dedicated hero and event-card photography are now wired using the centralized media system.
 - Phase 2 queued: real per-dish asset acquisition, editorial/event photography, and Cloudinary migration.
 
 ## Review findings to preserve

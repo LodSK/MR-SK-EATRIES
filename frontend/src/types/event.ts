@@ -7,4 +7,5 @@ export interface RestaurantEvent {
   schedule: string;
   frequency: EventFrequency;
   icon: "music" | "wine" | "utensils" | "cake" | "sun" | "gift";
+  imageSrc?: string;
 }

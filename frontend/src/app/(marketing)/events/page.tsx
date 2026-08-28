@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/shared/PageHero";
 import { EventCard } from "@/components/events/EventCard";
 import { RESTAURANT_EVENTS } from "@/lib/constants/events-data";
+import { EVENTS_HERO_IMAGE } from "@/lib/constants/media";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -12,6 +13,7 @@ export default function EventsPage() {
   return (
     <>
       <PageHero
+        imageSrc={EVENTS_HERO_IMAGE}
         eyebrow="What's On"
         title="Events at MR_SK EATRIES"
         subtitle="Recurring evenings worth planning around, and celebrations we'll help you host."

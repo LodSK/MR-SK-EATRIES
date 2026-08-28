@@ -9,6 +9,7 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "Every Friday, 7:00 PM – 10:00 PM",
     frequency: "weekly",
     icon: "music",
+    imageSrc: "/images/gallery/ambiance-bar.jpg",
   },
   {
     id: "ev-wine",
@@ -18,6 +19,7 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "Last Thursday of every month, 6:30 PM",
     frequency: "monthly",
     icon: "wine",
+    imageSrc: "/images/gallery/ambiance-private-dining.jpg",
   },
   {
     id: "ev-chefs-table",
@@ -27,6 +29,7 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "First Saturday of every month, 7:30 PM",
     frequency: "monthly",
     icon: "utensils",
+    imageSrc: "/images/menu/dinner.jpg",
   },
   {
     id: "ev-brunch",
@@ -36,6 +39,7 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "Every Sunday, 11:00 AM – 2:00 PM",
     frequency: "weekly",
     icon: "sun",
+    imageSrc: "/images/menu/breakfast.jpg",
   },
   {
     id: "ev-birthday",
@@ -45,6 +49,7 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "Any day, with 48 hours' notice",
     frequency: "one-time",
     icon: "cake",
+    imageSrc: "/images/gallery/ambiance-patio.jpg",
   },
   {
     id: "ev-holiday",
@@ -54,5 +59,6 @@ export const RESTAURANT_EVENTS: RestaurantEvent[] = [
     schedule: "Quarterly — announced via newsletter",
     frequency: "one-time",
     icon: "gift",
+    imageSrc: "/images/menu/desserts.jpg",
   },
 ];

@@ -17,6 +17,7 @@ import type { MenuCategorySlug } from "@/types/menu";
 export const HERO_IMAGE = "/images/hero/hero-bright-dining-room.jpg";
 export const MENU_HERO_IMAGE = "/images/menu/dinner.jpg";
 export const GALLERY_HERO_IMAGE = "/images/gallery/ambiance-private-dining.jpg";
+export const EVENTS_HERO_IMAGE = "/images/gallery/ambiance-fireplace.jpg";
 
 export const CATEGORY_IMAGE: Record<MenuCategorySlug, string> = {
   breakfast: "/images/menu/breakfast.jpg",
