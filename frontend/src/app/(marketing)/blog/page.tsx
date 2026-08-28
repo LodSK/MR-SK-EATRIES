@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description: "Stories, recipes, and behind-the-scenes notes from MR_SK EATRIES.",
 };
 
+// Blog content is served by the backend. Do not make Netlify's build depend
+// on the backend being reachable while generating this page.
+export const dynamic = "force-dynamic";
+
 export default async function BlogPage() {
   const posts = await getBlogPosts();
 

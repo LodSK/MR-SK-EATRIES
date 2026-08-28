@@ -12,6 +12,10 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Blog content is served by the backend. Do not make Netlify's build depend
+// on the backend being reachable while generating this page.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);

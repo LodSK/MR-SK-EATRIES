@@ -17,17 +17,25 @@ function normalizePost(raw: BlogPost & { _id?: string }): BlogPost {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  const res = await fetch(`${API_BASE_URL}/blog`, { next: { revalidate: 60 } });
-  if (!res.ok) return [];
-  const json = await res.json();
-  return (json.data as BlogPost[]).map(normalizePost);
+  try {
+    const res = await fetch(`${API_BASE_URL}/blog`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.data as BlogPost[]).map(normalizePost);
+  } catch {
+    return [];
+  }
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  const res = await fetch(`${API_BASE_URL}/blog/${slug}`, { next: { revalidate: 60 } });
-  if (!res.ok) return null;
-  const json = await res.json();
-  return normalizePost(json.data);
+  try {
+    const res = await fetch(`${API_BASE_URL}/blog/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return normalizePost(json.data);
+  } catch {
+    return null;
+  }
 }
 
 // ── Admin ──────────────────────────────────────────────────────────
