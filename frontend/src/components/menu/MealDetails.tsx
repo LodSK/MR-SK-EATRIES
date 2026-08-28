@@ -77,7 +77,7 @@ export function MealDetails({ item, relatedItems }: MealDetailsProps) {
     <div className="section-container py-12 sm:py-16">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
         <div ref={galleryWrapRef}>
-          <MealGallery name={item.name} category={item.category} />
+          <MealGallery name={item.name} category={item.category} imageSrc={item.images?.[0]} />
         </div>
 
         <div className="flex flex-col gap-5">

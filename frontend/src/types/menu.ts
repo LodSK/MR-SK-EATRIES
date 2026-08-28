@@ -20,6 +20,7 @@ export interface FeaturedMeal {
   rating: number;
   reviewCount: number;
   category: MenuCategorySlug;
+  images?: string[];
   tag?: MealTag;
 }
 
@@ -38,6 +39,7 @@ export interface SpecialOffer {
   originalPrice: number;
   discountedPrice: number;
   currency: string;
+  images?: string[];
   discountPercent: number;
   badge: string;
 }
@@ -67,6 +69,7 @@ export interface MenuItem {
   category: MenuCategorySlug;
   price: number;
   currency: string;
+  images?: string[];
   rating: number;
   reviewCount: number;
   prepTimeMinutes: number;

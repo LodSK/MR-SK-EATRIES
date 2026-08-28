@@ -32,6 +32,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 4.9,
     reviewCount: 214,
     category: "dinner",
+    images: ["/images/menu/dinner.jpg"],
     tag: "Chef's Pick",
   },
   {
@@ -43,6 +44,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 4.8,
     reviewCount: 156,
     category: "dinner",
+    images: ["/images/menu/seafood.jpg"],
     tag: "Popular",
   },
   {
@@ -54,6 +56,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 4.7,
     reviewCount: 189,
     category: "breakfast",
+    images: ["/images/menu/breakfast.jpg"],
     tag: "New",
   },
   {
@@ -65,6 +68,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 4.6,
     reviewCount: 97,
     category: "lunch",
+    images: ["/images/menu/lunch.jpg"],
   },
   {
     id: "dark-chocolate-fondant",
@@ -75,6 +79,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 5.0,
     reviewCount: 241,
     category: "desserts",
+    images: ["/images/menu/desserts.jpg"],
     tag: "Popular",
   },
   {
@@ -86,6 +91,7 @@ export const FEATURED_MEALS: FeaturedMeal[] = [
     rating: 4.9,
     reviewCount: 128,
     category: "drinks",
+    images: ["/images/menu/drinks.jpg"],
     tag: "Chef's Pick",
   },
 ] as const;

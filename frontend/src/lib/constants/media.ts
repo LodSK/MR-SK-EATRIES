@@ -15,6 +15,8 @@ import type { MenuCategorySlug } from "@/types/menu";
  */
 
 export const HERO_IMAGE = "/images/hero/hero-bright-dining-room.jpg";
+export const MENU_HERO_IMAGE = "/images/menu/dinner.jpg";
+export const GALLERY_HERO_IMAGE = "/images/gallery/ambiance-private-dining.jpg";
 
 export const CATEGORY_IMAGE: Record<MenuCategorySlug, string> = {
   breakfast: "/images/menu/breakfast.jpg",
@@ -58,3 +60,15 @@ export const BLOG_COVER_IMAGE: Record<string, string> = {
   "from-farm-to-table-where-our-ingredients-come-from":
     "/images/blog/from-farm-to-table-where-our-ingredients-come-from.jpg",
 };
+
+/** Real local photography used for social/editorial tiles until live social media is connected. */
+export const SOCIAL_IMAGE_POOL = [
+  "/images/gallery/ambiance-patio.jpg",
+  "/images/menu/breakfast.jpg",
+  "/images/menu/drinks.jpg",
+  "/images/menu/dinner.jpg",
+  "/images/gallery/ambiance-kitchen.jpg",
+  "/images/menu/desserts.jpg",
+  "/images/menu/pizza.jpg",
+  "/images/gallery/ambiance-private-dining.jpg",
+];

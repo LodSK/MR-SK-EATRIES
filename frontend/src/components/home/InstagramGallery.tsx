@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Instagram } from "lucide-react";
 import { SOCIAL_POSTS } from "@/lib/constants/social-gallery-data";
 import { CATEGORY_ICON } from "@/lib/constants/homepage-data";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/config/site";
+import { SOCIAL_IMAGE_POOL } from "@/lib/constants/media";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { cn } from "@/lib/utils/cn";
 import { gsap } from "@/lib/animations/gsap";
@@ -58,7 +60,7 @@ export function InstagramGallery() {
         ref={gridRef}
         className="grid auto-rows-[140px] grid-cols-2 gap-3 sm:auto-rows-[160px] sm:gap-4 md:grid-cols-4"
       >
-        {SOCIAL_POSTS.map((post) => {
+        {SOCIAL_POSTS.map((post, index) => {
           const Icon = CATEGORY_ICON[post.category];
           return (
             <a
@@ -68,16 +70,20 @@ export function InstagramGallery() {
               rel="noopener noreferrer"
               aria-label={`View on Instagram: ${post.caption}`}
               className={cn(
-                "group relative flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand-secondary via-brand-secondary to-brand-primary-dark",
+                "group relative flex items-center justify-center overflow-hidden rounded-xl bg-card",
                 post.tall && "row-span-2"
               )}
             >
-              <div className="bg-noise absolute inset-0 opacity-[0.05]" aria-hidden="true" />
-              <Icon
-                className="h-10 w-10 text-white/20 transition-transform duration-500 group-hover:scale-110"
-                strokeWidth={1.25}
-                aria-hidden="true"
+              <Image
+                src={SOCIAL_IMAGE_POOL[index % SOCIAL_IMAGE_POOL.length]}
+                alt=""
+                loading="lazy"
+                fill
+                sizes="(min-width: 768px) 25vw, 50vw"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/10" aria-hidden="true" />
+              <Icon className="absolute h-10 w-10 text-white/70" strokeWidth={1.25} aria-hidden="true" />
 
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/0 p-4 text-center opacity-0 transition-all duration-300 group-hover:bg-black/60 group-hover:opacity-100">
                 <Instagram className="h-6 w-6 text-white" />

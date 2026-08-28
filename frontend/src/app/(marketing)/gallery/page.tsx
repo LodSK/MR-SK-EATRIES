@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/shared/PageHero";
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
+import { GALLERY_HERO_IMAGE } from "@/lib/constants/media";
 
 export const metadata: Metadata = {
   title: "Gallery",
@@ -11,6 +12,7 @@ export default function GalleryPage() {
   return (
     <>
       <PageHero
+        imageSrc={GALLERY_HERO_IMAGE}
         eyebrow="A Closer Look"
         title="Gallery"
         subtitle="Dishes, drinks, and the atmosphere that makes MR_SK EATRIES what it is."

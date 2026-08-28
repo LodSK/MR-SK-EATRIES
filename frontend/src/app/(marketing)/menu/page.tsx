@@ -7,6 +7,7 @@ import { MenuCategoryGrid } from "@/components/menu/MenuCategoryGrid";
 import { MenuGrid } from "@/components/menu/MenuGrid";
 import { MenuBrowser } from "@/components/menu/MenuBrowser";
 import { AIMenuAssistant } from "@/components/ai/AIMenuAssistant";
+import { MENU_HERO_IMAGE } from "@/lib/constants/media";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -24,6 +25,7 @@ export default async function MenuLandingPage() {
   return (
     <>
       <PageHero
+        imageSrc={MENU_HERO_IMAGE}
         eyebrow="The Full Menu"
         title="Every Dish, One Kitchen"
         subtitle="Nine categories, one standard. Search, filter, or browse by craving — everything here is made to order."

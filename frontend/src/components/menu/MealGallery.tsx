@@ -5,6 +5,7 @@ import { CATEGORY_IMAGE } from "@/lib/constants/media";
 interface MealGalleryProps {
   name: string;
   category: MenuCategorySlug;
+  imageSrc?: string;
 }
 
 /**
@@ -15,11 +16,11 @@ interface MealGalleryProps {
  * added later via the existing admin upload flow (MenuItem.images);
  * this component would then prefer that over the category fallback.
  */
-export function MealGallery({ name, category }: MealGalleryProps) {
+export function MealGallery({ name, category, imageSrc }: MealGalleryProps) {
   return (
     <div className="relative h-72 overflow-hidden rounded-2xl sm:h-96">
       <Image
-        src={CATEGORY_IMAGE[category]}
+        src={imageSrc ?? CATEGORY_IMAGE[category]}
         alt={name}
         fill
         priority

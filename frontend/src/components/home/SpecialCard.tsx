@@ -27,7 +27,7 @@ export function SpecialCard({ special }: SpecialCardProps) {
     >
       <div ref={imageRevealRef} className="relative h-44 overflow-hidden">
         <Image
-          src={CATEGORY_IMAGE[special.category]}
+          src={special.images?.[0] ?? CATEGORY_IMAGE[special.category]}
           alt={special.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"

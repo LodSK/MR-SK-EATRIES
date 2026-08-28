@@ -37,7 +37,7 @@ export function MenuCard({ item }: MenuCardProps) {
     >
       <div ref={imageRevealRef} className="relative h-48 overflow-hidden">
         <Image
-          src={CATEGORY_IMAGE[item.category]}
+          src={item.images?.[0] ?? CATEGORY_IMAGE[item.category]}
           alt={item.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"

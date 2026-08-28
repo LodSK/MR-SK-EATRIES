@@ -67,7 +67,7 @@ export function MealCard({ meal }: MealCardProps) {
     >
       <div ref={imageRevealRef} className="relative h-52 overflow-hidden">
         <Image
-          src={CATEGORY_IMAGE[meal.category]}
+          src={meal.images?.[0] ?? CATEGORY_IMAGE[meal.category]}
           alt={meal.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"

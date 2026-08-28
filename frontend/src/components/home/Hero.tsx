@@ -138,7 +138,7 @@ export function Hero({ imageSrc, videoSrc }: HeroProps) {
         ) : imageSrc ? (
           <Image
             src={imageSrc}
-            alt="A signature dish at MR_SK EATRIES, elegantly plated"
+            alt="Bright modern dining room at MR_SK EATRIES"
             fill
             priority
             className="object-cover"
