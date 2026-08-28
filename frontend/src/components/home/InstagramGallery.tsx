@@ -62,6 +62,7 @@ export function InstagramGallery() {
       >
         {SOCIAL_POSTS.map((post, index) => {
           const Icon = CATEGORY_ICON[post.category];
+          const imageSrc = SOCIAL_IMAGE_POOL[index % SOCIAL_IMAGE_POOL.length]!;
           return (
             <a
               key={post.id}
@@ -75,7 +76,7 @@ export function InstagramGallery() {
               )}
             >
               <Image
-                src={SOCIAL_IMAGE_POOL[index % SOCIAL_IMAGE_POOL.length]}
+                src={imageSrc}
                 alt=""
                 loading="lazy"
                 fill
