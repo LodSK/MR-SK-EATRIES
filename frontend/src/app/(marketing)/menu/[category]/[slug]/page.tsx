@@ -4,13 +4,20 @@ import { getMenuItemBySlug, getMenuItems, getRelatedMenuItems } from "@/lib/api/
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { MealDetails } from "@/components/menu/MealDetails";
 
+export const dynamic = "force-dynamic";
+
 interface MealPageProps {
   params: Promise<{ category: string; slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const items = await getMenuItems();
-  return items.map((item) => ({ category: item.category, slug: item.slug }));
+  try {
+    const items = await getMenuItems();
+    return items.map((item) => ({ category: item.category, slug: item.slug }));
+  } catch {
+    // The API is a separate service and is not available during every build.
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: MealPageProps): Promise<Metadata> {

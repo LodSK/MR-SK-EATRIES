@@ -9,13 +9,20 @@ import type { MenuCategorySlug } from "@/types/menu";
 import { PageHero } from "@/components/shared/PageHero";
 import { MenuBrowser } from "@/components/menu/MenuBrowser";
 
+export const dynamic = "force-dynamic";
+
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
 export async function generateStaticParams() {
-  const categories = await getMenuCategories();
-  return categories.map((category) => ({ category: category.slug }));
+  try {
+    const categories = await getMenuCategories();
+    return categories.map((category) => ({ category: category.slug }));
+  } catch {
+    // The API is a separate service and is not available during every build.
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {

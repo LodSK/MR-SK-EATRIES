@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     "Explore the full MR_SK EATRIES menu — breakfast, lunch, dinner, burgers, pizza, chicken, seafood, desserts, and drinks. Search, filter, and order online.",
 };
 
+// Menu data comes from the separate API service. Render this route at request
+// time so Netlify's build does not need the backend running on localhost.
+export const dynamic = "force-dynamic";
+
 export default async function MenuLandingPage() {
   const [categories, items, featured] = await Promise.all([
     getMenuCategories(),
