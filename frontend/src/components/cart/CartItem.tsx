@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import type { CartItem as CartItemType } from "@/types/cart";
-import { CATEGORY_ICON } from "@/lib/constants/category-icons";
 import { CATEGORY_IMAGE } from "@/lib/constants/media";
 import { formatCurrency } from "@/lib/utils/cart";
 import { useCart } from "@/lib/hooks/useCart";
@@ -18,7 +17,6 @@ interface CartItemProps {
 
 export function CartItem({ item, compact = false }: CartItemProps) {
   const { updateQuantity, removeItem } = useCart();
-  const Icon = CATEGORY_ICON[item.category];
   const lineTotal = item.price * item.quantity;
 
   const nameContent = item.slug ? (

@@ -38,7 +38,10 @@ function normalizeMenuItem(raw: MenuItem & { _id?: string }): MenuItem {
 }
 
 async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, { next: { revalidate: 60 } });
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    next: { revalidate: 60 },
+    signal: AbortSignal.timeout(5000),
+  });
   if (!res.ok) throw new Error(`Menu API request failed: ${res.status} ${path}`);
   const json = await res.json();
   return json.data as T;

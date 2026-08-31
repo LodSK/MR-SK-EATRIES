@@ -18,7 +18,10 @@ function normalizePost(raw: BlogPost & { _id?: string }): BlogPost {
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/blog`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/blog`, {
+      next: { revalidate: 60 },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!res.ok) return [];
     const json = await res.json();
     return (json.data as BlogPost[]).map(normalizePost);
@@ -29,7 +32,10 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/blog/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/blog/${slug}`, {
+      next: { revalidate: 60 },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return normalizePost(json.data);
